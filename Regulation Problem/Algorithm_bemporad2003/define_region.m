@@ -1,4 +1,4 @@
-function [A, b, type] = define_region(G, W, S, G_tio, W_tio, S_tio, H, tol)
+function [A, b, type, origem] = define_region(G, W, S, G_tio, W_tio, S_tio, H, tol)
 %[A, b] = define_region(G, W, S, G_tio, W_tio, S_tio, H, tol)
 %
 %Find the set of matrices inequalities that define the critical region.
@@ -28,6 +28,10 @@ function [A, b, type] = define_region(G, W, S, G_tio, W_tio, S_tio, H, tol)
     b = [];
     type = [];
     
+    %Indica que as restrições geradas pela eq 13 nao estao relacionadas a
+    %nenhum outro indice, não é exatamente isso, mas facilita o algoritmo
+    origem = zeros(size(A_2,1),1);
+    
     for i = 1:size(A_2,1)
         flag = 0;
         
@@ -51,13 +55,14 @@ function [A, b, type] = define_region(G, W, S, G_tio, W_tio, S_tio, H, tol)
         for j = 1:size(A_1,2) 
             if(A_1(i,j) > tol || A_1(i,j) < -tol )
                 flag = 1;
-            end   
+            end
         end
         
         if flag == 1
             A = [A; A_1(i,:)];
             b = [b; b_1(i,:)];
             type = [type; 1];
+            origem = [origem; i]; %Salva a origem as restrições ativas
         end
    
     end    

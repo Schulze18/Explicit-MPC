@@ -48,11 +48,12 @@ function [ origem ] = verify_const_origin(A, b, G, W, S, z0, all_possible_const)
             A_test = all_possible_const{j,1};
             b_test = all_possible_const{j,2};
             for k = 1:size(A_test,1)
-                if ((A(i,1) == A_test(k,1)) && (A(i,2) == A_test(k,2)) && (A(i,2) == A_test(k,2)) && (b(i) == b_test(k))) 
+                if ((A(i,1) == A_test(k,1)) && (A(i,2) == A_test(k,2)) && (b(i) == b_test(k))) 
                     if (origem(i) ~= 0)
                         disp('nope');
                     end
-                    origem(i) = k;
+                     %origem(i) = k;
+                     origem(i) = j;
                 end
             end
         end

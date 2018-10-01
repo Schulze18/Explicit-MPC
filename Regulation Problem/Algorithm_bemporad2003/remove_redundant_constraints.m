@@ -1,4 +1,4 @@
-function [A_new, b_new, type_new] = remove_redundant_constraints(A, b, type_new, Nu, Nstate)
+function [A_new, b_new, type_new, origem_new] = remove_redundant_constraints(A, b, type_new, origem_new, Nu, Nstate)
 %[A_new, b_new] = remove_redundant_constraints(A, b, Nu, Nstate)
 %
 %Remove the redundant constraints of a polyehdral defined by Ax<=b.
@@ -47,6 +47,7 @@ function [A_new, b_new, type_new] = remove_redundant_constraints(A, b, type_new,
         A_new(index(k)-k+1,:) = [];
         b_new(index(k)-k+1,:) = [];
         type_new(index(k)-k+1,:) = [];
+        origem_new(index(k)-k+1,:) = [];
     end
 
 end

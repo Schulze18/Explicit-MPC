@@ -12,8 +12,8 @@ Ny = 2;
 Nu = 2;
 Nc = 2;
 Nstate = 2;
-Umax = 2;
-Umin = -2;
+Umax = 0.2;
+Umin = -0.4;
 tol = 1e-8;
 x_inicial = [1 1]';
 Xmax = [];%[1.5 1.5];
@@ -83,11 +83,15 @@ while isempty(Lcand) == 0
     length(Lcand)
     if isempty(Lcand{end,1}) == 0
         [ G_tio, W_tio, S_tio] = build_active_const(G, W, S, Lcand{end,1});
-        [A, b, type] = define_region(G, W, S, G_tio, W_tio, S_tio, H, tol);
+        %[A, b, type] = define_region(G, W, S, G_tio, W_tio, S_tio, H, tol);
+        [A, b, type, origem] = define_region(G, W, S, G_tio, W_tio, S_tio, H, tol);
         if (isempty(A) == 0)
-            [A, b, type] = remove_redundant_constraints(A, b, type, Nu, Nstate);
+            %[A, b, type] = remove_redundant_constraints(A, b, type, Nu, Nstate);
+            
+            [A, b, type, origem] = remove_redundant_constraints(A, b, type, origem, Nu, Nstate);
             [Kx, Ku] = define_control(G, W, S, G_tio, W_tio, S_tio, H, F);
-            [ origem ] = verify_const_origin(A, b, G, W, S, z0, all_possible_const);
+            %[ origem ] = verify_const_origin(A, b, G, W, S, z0, all_possible_const);
+            %[ origem ] = verify_const_origin(A, b, G, W, S, z0, all_possible_const);
             Lopt = [Lopt; sort(Lcand{end,1})];
         end
     else
@@ -96,6 +100,7 @@ while isempty(Lcand) == 0
         origem = (1:size(G,1))';
         type = ones(size(G,1),1);
         Kx = (-inv(H)*F');
+        Kx = Kx(1,:);
         Ku = 0;
     end
     
