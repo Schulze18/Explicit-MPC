@@ -10,7 +10,6 @@ function [A_new, b_new, type_new, origem_new] = remove_redundant_constraints(A, 
 %
 %Algoritm based on the paper "The explicit linear quadratic regulator for
 %constrained systems" by A. Bemporad, M. Morari, V. Dua, and E. Pistikopoulos. 
-
     index = [];
       
     for i=1:size(A,1)

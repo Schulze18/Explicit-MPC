@@ -122,7 +122,7 @@ while isempty(Lcand) == 0
     end
     
     %if (isempty(A) == 0 || status_infesiable == 0)
-    if ((isempty(A) == 0) && (status_infesiable == 0) && (sum((sum(isnan(A)))) == 0) && (sum((sum(isinf(A)))) == 0))
+    if (isempty(A) == 0) && status_infesiable == 0)
         
         CR = {A b Kx Ku};
         Regions = [Regions; CR];
@@ -187,14 +187,14 @@ end
     
 
 %%
-figure(8)
+figure(5)
 hold on
 for i=1:size(Regions,1)
     %plotregion(-[Regions{i,1}; 1 0; -1 0; 0 1; 0 -1],-[Regions{i,2}; 1.5 ;1.5 ;1.5 ; 1.5 ])
-     %if i~=7
-%        plotregion(-[Regions{i,1}; 1 0; -1 0; 0 1; 0 -1],-[Regions{i,2}; 1.5 ;1.5 ;1.5 ; 1.5 ])
-     plotregion(-Regions{i,1},-Regions{i,2})
-   %end
+     if i~=7
+        plotregion(-[Regions{i,1}; 1 0; -1 0; 0 1; 0 -1],-[Regions{i,2}; 1.5 ;1.5 ;1.5 ; 1.5 ])
+%     plotregion(-Regions{i,1},-Regions{i,2})
+   end
     xlim([-1.5 1.5])
     ylim([-1.5 1.5])
     i
