@@ -1,11 +1,31 @@
-function  [ G_tio, W_tio, S_tio, index, flag] = resolve_degenerancy(G, W, S, H, F, A, b, Nu, Nstate, Lcand)
+function  [ G_tio, W_tio, S_tio, index, flag] = resolve_degenerancy(G, W, S, H, F, A, b, Nu, Nstate, Lcand, tol)
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
+    
+    %%%Reconstroi Região que originou a que esta sendo avaliada
+    indices_old = [];
+%     if length(Lcand) == 1
+%         indices_old = [];
+%         A = -S;
+%         b = W;
+%         origem = (1:size(G,1))';
+%         type = ones(size(G,1),1);
+%         [A, b, type, origem] = remove_redundant_constraints(A, b, type, origem, Nu, Nstate);
+%     else
+%         indices_old = Lcand(1:(end-1),:);
+%         [ G_tio, W_tio, S_tio] = build_active_const(G, W, S, indices_old);
+%         [A, b, type, origem] = define_region(G, W, S, G_tio, W_tio, S_tio, H, tol);
+%         [A, b, type, origem] = remove_redundant_constraints(A, b, type, origem, Nu, Nstate);
+%     end
+    %%%
+    %indices_old
+    %Lcand
+    %A = Lcand{1,2};
+    %b = Lcand{1,3};
     index = [];
     G_tio = [];
     W_tio = [];
     S_tio = [];
-
 
     [xc , r, diagnostics] = chebychev_ball(A, b, G, W, S, H, F, Nu, Nstate);
     

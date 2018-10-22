@@ -1,4 +1,4 @@
-function [H, F] = matrices_cost_function_reformulation(A, B, P, Q, R, Ny, Nu)
+function [H, F, Sx, Su] = matrices_cost_function_reformulation(A, B, P, Q, R, Ny, Nu)
 %[H, F] = matrices_cost_function_reformulation(A, B, P, Q, R, Ny, Nu)
 %
 %Return de matrices H and F from the reformulated cost function with U to

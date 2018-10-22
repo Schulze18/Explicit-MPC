@@ -1,5 +1,5 @@
 clear all
-close all
+%close all
 clc
 %System from Example 1 Bemporad 2002
 A = [0.7326 -0.0861;
@@ -15,16 +15,22 @@ Nstate = 2;
 Umax = 2;
 Umin = -2;
 tol = 1e-8;
+%reta: x2 = -0.9213*x1 + 0.1278
+% %GU < W + Ex
+% Ex >-W
+% E = [0.9213 1]; W= 0.1278
 x_inicial = [1 1]';
-Xmax = [1.5 1.5];
-Xmin = [-1.5 -1.5];
+Xmax = 2*[1.5 1.5];
+Xmin = 2*[-1.5 -1.5];
 P = dlyap(A,Q);
-
-[H,F] = matrices_cost_function_reformulation(A, B, P, Q, R, Ny, Nu);
-
-[G, W, E, S] = constraints_matrices_reformulation(B, H, F, Nu, Umax, Umin, Xmax, Xmin);
-
-all_possible_const = generate_all_possible_constraints(G, W, S, H, tol);
+%P = Q;
+%%
+[H, F, Sx, Su] = matrices_cost_function_reformulation(A, B, P, Q, R, Ny, Nu);
+%Su(1:2,:) = [];Sx(1:2,:) = [];
+[G, W, E, S] = constraints_matrices_reformulation(A, B, H, F, Sx, Su, Ny, Nu, Umax, Umin, Xmax, Xmin);
+%W = W(1:12,:);
+%%
+%all_possible_const = generate_all_possible_constraints(G, W, S, H, tol);
 % %%
 % %Calculo de z0 para o ponto inicial
 % z0 = optimal_z_mp_QP( G, W, S, H, F, x_inicial, Nu)
@@ -70,17 +76,19 @@ all_possible_const = generate_all_possible_constraints(G, W, S, H, tol);
 %%
 z0 = zeros(2,1);
 Lopt{1,1} = [];
-Lcand{1,1} = [];
+Lcand{1,1} = []; Lcand{1,2} = []; Lcand{1,3} = [];
 % z0 = zeros(Nu,1);
 Regions = {};
 N_zeros = 0;
 comb_ruim = {};
 
 while isempty(Lcand) == 0
-    disp('Exploradas ')
-    length(Lopt)
-    disp('Inexploradas ')
-    length(Lcand)
+    fprintf('Exploradas: %d\nInexploradas: %d\nRegioes: %d\n\n',length(Lopt),length(Lcand),length(Regions));
+    %disp(['Exploradas: ', length(Lopt),' Inexploradas: ',length(Lcand),' Regioes: ', length(Regions)])
+%     disp('Exploradas ')
+%     length(Lopt)
+%     disp('Inexploradas ')
+%     length(Lcand)
      status_infesiable = 0;
     if isempty(Lcand{end,1}) == 0
         [ G_tio, W_tio, S_tio] = build_active_const(G, W, S, Lcand{end,1});
@@ -88,7 +96,9 @@ while isempty(Lcand) == 0
         
         %status_infesiable = 0;
         if rank(G_tio) < size(G_tio,1) && rank(G_tio) < size(G_tio,2)
-            [ G_tio, W_tio, S_tio, index, status_infesiable] = resolve_degenerancy(G, W, S, H, F, A, b, Nu, Nstate, Lcand{end,1});
+            %[ G_tio, W_tio, S_tio, index, status_infesiable] = resolve_degenerancy(G, W, S, H, F, A, b, Nu, Nstate, Lcand{end,:}, tol);
+            [ G_tio, W_tio, S_tio, index, status_infesiable] = resolve_degenerancy(G, W, S, H, F, Lcand{end,2}, Lcand{end,3}, Nu, Nstate, Lcand{end,1}, tol);
+            disp('UEHUEHEHUEHUEHEHUEHUE')
         end
         
         if status_infesiable == 0
@@ -101,24 +111,33 @@ while isempty(Lcand) == 0
                 %[ origem ] = verify_const_origin(A, b, G, W, S, z0, all_possible_const);
                 %[ origem ] = verify_const_origin(A, b, G, W, S, z0, all_possible_const);
              else 
-                 Lopt = [Lopt; sort(Lcand{end,1})];
+                 %Lopt = [Lopt; sort(Lcand{end,1})];
              end
             
         end
             Lopt = [Lopt; sort(Lcand{end,1})];
 %         end
     else
-        A = -S(1:4,:);
-        b = W(1:4,:);
-        %origem = (1:size(G,1))';
-        origem = [1;2;3;4];
-        %type = ones(size(G,1),1);
-        type = ones(4,1);
-        %type = [type; 2*ones(4,1)];
-        %[A, b, type, origem] = remove_redundant_constraints(A, b, type, origem, Nu, Nstate);
+        A = -S;
+        b = W;
+        origem = (1:size(G,1))';
+        type = ones(size(G,1),1);
+        %type(5:end) = 2;
+        [A, b, type, origem] = remove_redundant_constraints(A, b, type, origem, Nu, Nstate);
         Kx = (-inv(H)*F');
         Kx = Kx(1,:);
         Ku = 0;
+% %         A = -S(1:4,:);
+% %         b = W(1:4,:);
+% %         %origem = (1:size(G,1))';
+% %         origem = [1;2;3;4];
+% %         %type = ones(size(G,1),1);
+% %         type = ones(4,1);
+% %         %type = [type; 2*ones(4,1)];
+% %         %[A, b, type, origem] = remove_redundant_constraints(A, b, type, origem, Nu, Nstate);
+% %         Kx = (-inv(H)*F');
+% %         Kx = Kx(1,:);
+% %         Ku = 0;
     end
     
     %if (isempty(A) == 0 || status_infesiable == 0)
@@ -143,14 +162,16 @@ while isempty(Lcand) == 0
                 end
             end
             
-            if (type(i) == 1 ) && (origem(i) ~= 0) && (isempty(Lcand{end,1}) || (flag_repeticao == 0))
-                %index_regions{i+1} = [index; origem(i)];
+            %if (type(i) == 1 ) && (origem(i) ~= 0) && (isempty(Lcand{end,1}) || (flag_repeticao == 0))
+            if (type(i) == 1 ) && (origem(i) ~= 0 && origem(i) < 5) && (isempty(Lcand{end,1}) || (flag_repeticao == 0)) 
+            %index_regions{i+1} = [index; origem(i)];
 %                 if isempty(Lcand{end,1}) == 0
 %                     if (Lcand{end,1} ~= origem(i)
                 
                 possible_new_set = [Lcand{end,1}; origem(i)];
             %elseif isempty(Lcand{end-1}) == 0
-            elseif type(i) == 2 && origem(i) ~= 0
+            %elseif type(i) == 2 && origem(i) ~= 0
+            elseif (type(i) == 2) && (origem(i) ~= 0) && (origem(i) >4)
                 %index_regions{i+1} = index(1:(end-1));
                  possible_new_set = Lcand{end,1};
                  possible_new_set = possible_new_set(1:end-1,1);
@@ -165,6 +186,8 @@ while isempty(Lcand) == 0
 
             if (check_if_verified(possible_new_set,Lopt) == false) && (isempty(possible_new_set) == 0)
                  L_new_cand{end+1,1} = possible_new_set;
+                 L_new_cand{end,2} = A;
+                 L_new_cand{end,3} = b;
 %                  disp('hue');
                   %L_new_cand = {L_new_cand; possible_new_set}
             end
@@ -174,7 +197,7 @@ while isempty(Lcand) == 0
         L_new_cand = {};
     end
     
-    Lcand(end) = [];
+    Lcand(end,:) = [];
     if isempty(L_new_cand) == 0
         if isempty(Lcand) == 1
             Lcand = L_new_cand;
@@ -187,16 +210,16 @@ end
     
 
 %%
-figure(8)
+figure
 hold on
 for i=1:size(Regions,1)
-    %plotregion(-[Regions{i,1}; 1 0; -1 0; 0 1; 0 -1],-[Regions{i,2}; 1.5 ;1.5 ;1.5 ; 1.5 ])
-     %if i~=7
-%        plotregion(-[Regions{i,1}; 1 0; -1 0; 0 1; 0 -1],-[Regions{i,2}; 1.5 ;1.5 ;1.5 ; 1.5 ])
-     plotregion(-Regions{i,1},-Regions{i,2})
-   %end
-    xlim([-1.5 1.5])
-    ylim([-1.5 1.5])
+   %plotregion(-[Regions{i,1}; 1 0; -1 0; 0 1; 0 -1],-[Regions{i,2}; 1.5 ;1.5 ;1.5 ; 1.5 ])
+   %plotregion(-[Regions{i,1}; 1 0; -1 0; 0 1; 0 -1],-[Regions{i,2}; 15 ;15 ;15 ; 15 ])
+   plotregion(-Regions{i,1},-Regions{i,2})
+   
+   
+    xlim([-5 5])
+    ylim([-5 5])
     i
 end
 
