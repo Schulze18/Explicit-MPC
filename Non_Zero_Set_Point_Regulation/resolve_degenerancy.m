@@ -1,7 +1,6 @@
-function  [ G_tio, W_tio, S_tio, index, flag] = resolve_degenerancy(G, W, S, H, F, A, b, Nu, Nstate, Lcand, tol)
-%UNTITLED2 Summary of this function goes here
+function  [ G_tio, W_tio, S_tio, index, flag] = resolve_degenerancy(G, W, S, H, F, A, b, Nstate, Ncontrol, Nout, Ny, Nu, Lcand, tol)
+%UNTITLED2 Summary of this function goes here 
 %   Detailed explanation goes here
-    
     %%%Reconstroi Região que originou a que esta sendo avaliada
     indices_old = [];
 %     if length(Lcand) == 1
@@ -27,12 +26,12 @@ function  [ G_tio, W_tio, S_tio, index, flag] = resolve_degenerancy(G, W, S, H, 
     W_tio = [];
     S_tio = [];
 
-    [xc , r, diagnostics] = chebychev_ball(A, b, G, W, S, H, F, Nu, Nstate);
+    [xc , r, diagnostics] = chebychev_ball(A, b, G, W, S, H, F, Nstate, Ncontrol, Nout, Ny, Nu);
     
-    if  diagnostics.problem > 0
+    if  (diagnostics.problem > 0) || (sum(isnan(xc)) > 0) 
         flag = 1;
     else
-        [z0, diagnostics] = optimal_z_mp_QP(G, W, S, H, F, xc, Nu);
+        [z0, diagnostics] = optimal_z_mp_QP(G, W, S, H, F, xc, Nstate, Ncontrol, Nout, Ny, Nu);
         if diagnostics.problem > 0
             flag = 1;
         else

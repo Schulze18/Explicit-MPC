@@ -1,4 +1,4 @@
-function [Kx, Kc] = define_control(G, W, S, G_tio, W_tio, S_tio, H, F)
+function [Kx, Kc] = define_control(G, W, S, G_tio, W_tio, S_tio, H, F, Ncontrol)
 %[Kx, Kc] = define_control(G, W, S, G_tio, W_tio, S_tio, H, F)
 %
 %Find the control law associated to the critical region.
@@ -19,7 +19,7 @@ function [Kx, Kc] = define_control(G, W, S, G_tio, W_tio, S_tio, H, F)
     T = inv(H)*G_tio'*inv(G_tio*inv(H)*G_tio');
     Kx = (T*S_tio-inv(H)*F');
     Kc = T*W_tio;
-    Kx = Kx(1,:);
-    Kc = Kc(1,:);
+    Kx = Kx(1:Ncontrol,:);
+    Kc = Kc(1:Ncontrol,:);
 end
 

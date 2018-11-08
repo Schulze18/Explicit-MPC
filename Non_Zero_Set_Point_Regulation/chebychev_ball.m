@@ -1,4 +1,4 @@
-function [xc , r, diagnostics] = chebychev_ball(A, b, G, W, S, H, F, Nu, Nstate)
+function [xc , r, diagnostics] = chebychev_ball(A, b, G, W, S, H, F, Nstate, Ncontrol, Nout, Ny, Nu)
 %[xc , r, diagnostics] = chebychev_ball(A, b, G, W, S, H, F, Nu, Nstate)
 %
 %Return the center of the largest possible ball that can be placed inside
@@ -21,10 +21,9 @@ function [xc , r, diagnostics] = chebychev_ball(A, b, G, W, S, H, F, Nu, Nstate)
 %Algoritm based on the paper "The explicit linear quadratic regulator for
 %constrained systems" by A. Bemporad, M. Morari, V. Dua, and E. Pistikopoulos. 
    
-
     xc = sdpvar(Nstate,1,'full');
     r = sdpvar(1);
-    z = sdpvar(Nu,1,'full'); 
+    z = sdpvar(Nu*Ncontrol,1,'full'); 
     
     LMI = [];
     for i = 1:size(A,1)

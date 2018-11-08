@@ -1,4 +1,4 @@
-function [z0, diagnostics] = optimal_z_mp_QP(G, W, S, H, F, x0, Nu)
+function [z0, diagnostics] = optimal_z_mp_QP(G, W, S, H, F, x0, Nstate, Ncontrol, Nout, Ny, Nu)
 %[z0, diagnostics] = optimal_z_mp_QP(G, W, S, H, F, x0, Nu)
 %
 %Calculate the optmizal z to the mp-QP problem: 
@@ -20,7 +20,7 @@ function [z0, diagnostics] = optimal_z_mp_QP(G, W, S, H, F, x0, Nu)
 %
 %Algoritm based on the paper "The explicit linear quadratic regulator for
 %constrained systems" by A. Bemporad, M. Morari, V. Dua, and E. Pistikopoulos. 
-    U = sdpvar(Nu,1,'full'); 
+    U = sdpvar(Nu*Nout,1,'full'); 
     z = U + inv(H)*F'*x0; 
 
     LMI = [];
