@@ -32,8 +32,15 @@ function [xc , r, diagnostics] = chebychev_ball(A, b, G, W, S, H, F, Nstate, Nco
     LMI = [LMI; G*z - S*xc <= W];
 
     options=sdpsettings;
-    options.solver='sedumi';
+%     options.solver='sedumi';
+    options.solver='sdpt3';
     options.verbose = 0;
+    options.cachesolvers = 1;
+    
+    options.sdpt3.maxit = 20;
+    options.sdpt3.steptol = 1.0000e-05;
+    options.sdpt3.gaptol = 5.000e-5;
+    
     diagnostics = optimize(LMI,-r,options);
     
     xc = double(xc);

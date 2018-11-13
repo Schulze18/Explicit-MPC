@@ -1,6 +1,6 @@
 %Explicit MPC for Iris 3DR Quadcopter for z,theta,phi and psi control
 clear all
-close all
+% close all
 clc
 
 %Iris 3DR Parameters
@@ -52,26 +52,36 @@ Cc = [1 0 0 0 0 0 0 0;
  Nref = Nout;
  
  %Explicit MPC Parameters
- Q = diag([1,10,10,10]);
- R = diag([0.0001,0.01,0.01,0.01]);
- Ny = 5;
- Nu = 4;
- U_max = [2*g Inf Inf Inf];
- U_min = [-g -Inf -Inf -Inf];
+ Q = diag([1,1,1,1]);
+ R = diag([0.0001,0.001,0.001,0.001]);
+ Ny = 7;
+ Nu = 5;
+ U_max = [2*m*g 0.5 Inf Inf];
+ U_min = [-m*g -0.5 -Inf -Inf];
+%  U_max = [2*m*g Inf Inf Inf];
+%  U_min = [-m*g -Inf -Inf -Inf];
+%  
 %  U_max = [2*g 20 20 20]';
 %  U_min = [-g -g -g -g]';
- Ref_max = [30 Inf Inf Inf]';
- Ref_min = [-1 -Inf -Inf -Inf]';
+ Ref_max = [];%[30 Inf Inf Inf]';
+ Ref_min = [];%[-1 -Inf -Inf -Inf]';
 %  Ref_max = 30*ones(1,4)';
 %  Ref_min = [-1 -5 -10 -11]';
- X_max = [Inf 1 2 Inf Inf Inf Inf Inf]';
- X_min = -[Inf 10 Inf 2 Inf Inf Inf Inf]';
- tol = 1e-8;
+ X_max = [];%[Inf 1 2 Inf Inf Inf Inf Inf]';
+ X_min = [];%-[Inf 10 Inf Inf Inf Inf Inf Inf]';
+ Y_max = [];%[10 Inf Inf Inf]';
+ Y_min = [];%[-1.5 -Inf -Inf -Inf]';
+ 
+ % Code parameters
+ tol = 1e-7;
+ n_plot = 20;
+ last_plot = 0;
  
  %%
  [H, F, Sx, Su, Qlinha, Rlinha, Clinha] = setpoint_generic_matrices_cost_function(A, B, C, Q, R, Nstate, Ncontrol, Nout, Ny, Nu);
- [G, W, E, S, num_Gu] = setpoint_generic_constraints(Sx, Su, Clinha, H, F, Nstate, Ncontrol, Nout, Nref, Ny, Nu, U_max, U_min, X_max, X_min, Ref_max,Ref_min);
- %[G_u, W_u, E_u,G_u_max, W_u_max, E_u_max, G_r, W_r, E_r,num_Gu] = setpoint_generic_constraints(Sx, Su, Clinha, H, F, Nstate, Ncontrol, Nout, Nref, Ny, Nu, U_max, U_min, X_max, X_min, Ref_max,Ref_min);
+ %%
+ [G, W, E, S, num_Gu] = setpoint_generic_constraints(Sx, Su, Clinha, H, F, Nstate, Ncontrol, Nout, Nref, Ny, Nu, U_max, U_min, Ref_max, Ref_min, X_max, X_min, Y_max, Y_min);
+ %[G_u, W_u, E_u, G_u_max, W_u_max, E_u_max, G_r, W_r, E_r,num_Gu] = setpoint_generic_constraints(Sx, Su, Clinha, H, F, Nstate, Ncontrol, Nout, Nref, Ny, Nu, U_max, U_min, X_max, X_min, Ref_max,Ref_min);
 %% Loop variables Initialization
 Lopt{1,1} = [];Lcand{1,2} = []; Lcand{1,3} = [];
 %Lcand{1,1} = [6]; Lcand{1,2} = []; Lcand{1,3} = [];
@@ -211,10 +221,14 @@ while isempty(Lcand) == 0
         end
     end
 %     Lcand{end,1}
-    fprintf('Exploradas: %d\nInexploradas: %d\nRegioes: %d\n\n',length(Lopt),length(Lcand),length(Regions));
+    
+    if (length(Lopt) - last_plot) > n_plot
+        fprintf('Exploradas: %d\nInexploradas: %d\nRegioes: %d\n\n',length(Lopt),length(Lcand),length(Regions));
+        last_plot = length(Lopt);
+    end
 end
 toc
-
+fprintf('Exploradas: %d\nInexploradas: %d\nRegioes: %d\n\n',length(Lopt),length(Lcand),length(Regions));
 
 %%
 % figure

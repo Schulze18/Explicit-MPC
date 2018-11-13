@@ -1,5 +1,5 @@
 %Explicit MPC for Iris 3DR Quadcopter for z,theta,phi and psi control
-close all
+% close all
 
 %Iris 3DR Parameters
 g = 9.81;
@@ -63,15 +63,15 @@ vetor_repeticao = zeros(1,Nsim);
 
 for i = 1:Nsim
     if i < (Nsim/2)
-        ref(:,i) = [1 0.3 0 0];
+        ref(:,i) = [1 0.3 0.2 -0.1]';
     else
-        ref(:,i) = [5 -0.3 0 0];
+        ref(:,i) = [5 -0.3 0.5 0.1]';
     end
 end  
-
+%%
 
 for i = 1:Nsim
-    index = 0;
+     index = 0;
     y(:,i) = C*x(:,i); 
     erro(:,i) = ref(:,i) - y(:,i); 
     cont_reg(i) = 0;

@@ -28,8 +28,16 @@ function [z0, diagnostics] = optimal_z_mp_QP(G, W, S, H, F, x0, Nstate, Ncontrol
      LMI = [LMI, G*z <= W + S*x0 ];
     objetivo = 0.5*z'*H*z;
     options = sdpsettings;
-    options.solver = 'sedumi';
+% %     options.solver = 'sedumi';
+%     options.verbose = 0;
+    
+    options.solver='sdpt3';
     options.verbose = 0;
+    options.cachesolvers = 1;
+    
+    options.sdpt3.maxit = 20;
+    options.sdpt3.steptol = 1.0000e-05;
+    options.sdpt3.gaptol = 5.000e-5;
     
     diagnostics = optimize(LMI,objetivo,options);
     z0 = double(z);

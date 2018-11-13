@@ -27,8 +27,14 @@ function  [ G_tio, W_tio, S_tio, index, flag] = resolve_degenerancy(G, W, S, H, 
     S_tio = [];
 
     [xc , r, diagnostics] = chebychev_ball(A, b, G, W, S, H, F, Nstate, Ncontrol, Nout, Ny, Nu);
+
+    for i = 1:size(xc,1)
+        if isnan(xc(i))
+            xc(i) = 0;
+        end
+    end
     
-    if  (diagnostics.problem > 0) || (sum(isnan(xc)) > 0) 
+    if  (diagnostics.problem > 0)% || (sum(isnan(xc)) > 0) 
         flag = 1;
     else
         [z0, diagnostics] = optimal_z_mp_QP(G, W, S, H, F, xc, Nstate, Ncontrol, Nout, Ny, Nu);
@@ -50,8 +56,18 @@ function  [ G_tio, W_tio, S_tio, index, flag] = resolve_degenerancy(G, W, S, H, 
             LMI = [LMI; lambda >= 0];
             
             options=sdpsettings;
-            options.solver='sedumi';
+%             options.solver='sedumi';
+%             options.verbose = 0;
+            
+            options.solver='sdpt3';
             options.verbose = 0;
+            options.cachesolvers = 1;
+            
+            options.sdpt3.maxit = 20;
+            options.sdpt3.steptol = 1.0000e-05;
+            options.sdpt3.gaptol = 5.000e-5;
+            
+            
             diagnostics = optimize(LMI,objective,options);
             
             

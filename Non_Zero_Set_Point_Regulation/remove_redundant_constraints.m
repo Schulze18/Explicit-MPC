@@ -22,13 +22,70 @@ function [A_new, b_new, type_new, origem_new] = remove_redundant_constraints(A, 
         end
         LMI = [LMI, A(i,:)*x <= (b(i)+1)];
         objetivo = A(i,:)*x;
+        
         options = sdpsettings;
-        options.solver = 'sedumi';
+        options.solver = 'sdpt3';
+% %         options.solver = 'linprog';
+% % %         options.solver = 'sedumi';
         options.verbose = 0;
-        optimize(LMI,-objetivo,options);
+        options.cachesolvers = 1;
+% % %%Sedumi
+% % %         options.sedumi.cg.stagtol = 5.000e-4;
+% % %         options.sedumi.eps = 1.0000e-04;
+% % %         options.sedumi.maxiter = 15;
+% %  
+% % %%SDPT3
+        options.sdpt3.maxit = 20;
+        options.sdpt3.steptol = 1.0000e-05;
+        options.sdpt3.gaptol = 5.000e-5;
+
+% % %%Linprog
+%         options.linprog.TolCon = 1e-8;
+%         options.linprog.TolFun = 1e-8;
+
+        diagnostics = optimize(LMI,-objetivo,options);
+   
         if(double(objetivo) <= b(i))
             index = [index, i];
         end
+        
+        %%%%%%%%%%%%%%
+  
+        
+%         
+%         A_ineq = [];
+%         B_ineq = [];
+%         for j=1:size(A,1)
+%             if j ~= i
+%                  A_ineq = [A_ineq; A(j,:)];
+%                  B_ineq = [B_ineq; b(j)];
+%             end
+%         end
+%        A_ineq = [A_ineq; A(i,:)];
+%        B_ineq = [B_ineq; (b(i)+1)];
+       
+%        H_quad = zeros(Nstate);
+%        F_quad =  -A(i,:);
+%        lb = zeros(Nstate,1);
+%        opt = optimoptions('quadprog');
+%        opt.MaxIterations = 20;
+%        opt.Display = 'none';
+%        opt.OptimalityTolerance = 1.0000e-08;
+%        opt.StepTolerance = 5.000e-8;
+%        
+%        x = quadprog(H_quad, F_quad, A_ineq, B_ineq);%, [],[],[],[],[], opt);
+        
+% %       F_lin = -(A(i,:)');
+% %       lb = -Inf*ones(Nstate,1);
+% %       ub = Inf*ones(Nstate,1);
+% %       opt = optimoptions('linprog','Display' ,'none');
+% %        opt.Algorithm = 'interior-point';
+% %        x = linprog(F_lin, A_ineq, B_ineq,[],[],lb,ub,[],opt)
+% %     
+% %        if(double(x)*A(i,:) <= b(i))
+% %             index = [index, i];
+% %        end
+              
     end
 %     A_new = [];
 %     b_new = [];

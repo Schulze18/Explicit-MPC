@@ -1,4 +1,4 @@
-function  [G, W, E, S, num_Gu] = setpoint_generic_constraints(Sx, Su, Clinha, H, F, Nstate, Ncontrol, Nout, Nref, Ny, Nu, U_max, U_min, X_max, X_min, Ref_max,Ref_min)
+function  [G, W, E, S, num_Gu] = setpoint_generic_constraints(Sx, Su, Clinha, H, F, Nstate, Ncontrol, Nout, Nref, Ny, Nu, U_max, U_min, Ref_max, Ref_min, X_max, X_min, Y_max, Y_min)
 %function  [G_u, W_u, E_u, G_u_max, W_u_max, E_u_max, G_r, W_r, E_r,num_Gu] = setpoint_generic_constraints(Sx, Su, Clinha, H, F, Nstate, Ncontrol, Nout, Nref, Ny, Nu, U_max, U_min, X_max, X_min, Ref_max,Ref_min)
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
@@ -6,12 +6,15 @@ function  [G, W, E, S, num_Gu] = setpoint_generic_constraints(Sx, Su, Clinha, H,
     G_u = [];
     G_x = [];
     G_r = [];
+    G_y = [];
     W_u = [];
     W_x = [];
     W_r = [];
+    W_y = [];
     E_u = [];
     E_x = [];
     E_r = [];
+    E_y = [];
     S = [];
     
     if isempty(U_max) == 0
@@ -186,10 +189,58 @@ function  [G, W, E, S, num_Gu] = setpoint_generic_constraints(Sx, Su, Clinha, H,
 %     G = G_x;
 %     E = E_x;
 %     S = 1;
+
+    if isempty(Y_max) == 0
+        G_y_max = [];
+        W_y_max = [];
+        E_y_max = [];
+        Suy = Clinha*Su;
+        Sxy = Clinha*Sx;
+        %for i = 1:(Ny+1)
+        for i = 2:(Ny+1)
+            for j = 1:Nout
+                if (Y_max(j) ~= Inf)
+                    G_y_max = [G_y_max; Suy(j+(i-1)*Nout,:)];
+                    W_y_max = [W_y_max; Y_max(j)];
+                    E_y_max = [E_y_max; -Sxy(j+(i-1)*Nout,:) zeros(1,Nref)];
+                end
+            end
+         end
+        
+        G_y = [G_y; G_y_max];
+        W_y = [W_y; W_y_max];
+        E_y = [E_y; E_y_max];
+        
+    end
+    
+    if isempty(Y_min) == 0
+        G_y_min = [];
+        W_y_min = [];
+        E_y_min = [];
+        Suy = Clinha*Su;
+        Sxy = Clinha*Sx;
+        %for i = 1:(Ny+1)
+        for i = 2:(Ny+1)
+            for j = 1:Nout
+                if (Y_min(j) ~= -Inf)
+                    G_y_min = [G_y_min; -Suy(j+(i-1)*Nout,:)];
+                    W_y_min = [W_y_min; -Y_min(j)];
+                    E_y_min = [E_y_min; Sxy(j+(i-1)*Nout,:) zeros(1,Nref)];
+                end
+            end
+         end
+        
+        G_y = [G_y; G_y_min];
+        W_y = [W_y; W_y_min];
+        E_y = [E_y; E_y_min];
+        
+    end
+    
+
     num_Gu = size(G_u,1) + size(G_r,1);
-    W = [W_u; W_r; W_x];
-    G = [G_u ; G_r; G_x];
-    E = [E_u ; E_r; E_x];
+    W = [W_u; W_r; W_x; W_y];
+    G = [G_u; G_r; G_x; G_y];
+    E = [E_u; E_r; E_x; E_y];
 
     S = E + G*inv(H)*F';
 
