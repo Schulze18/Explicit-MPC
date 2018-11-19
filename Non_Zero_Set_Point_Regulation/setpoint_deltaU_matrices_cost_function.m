@@ -1,4 +1,4 @@
-function [H, F, Sx, Su, Sdu, Qlinha, Rlinha, Clinha] = setpoint_deltaU_matrices_cost_function(A, B, C, Q, R, Nstate, Ncontrol, Nout, Ny, Nu)
+function [H, F, Sx, Su, Sdu, T_du, Qlinha, Rulinha, Rdulinha, Clinha] = setpoint_deltaU_matrices_cost_function(A, B, C, Q, Ru, Rdu, Nstate, Ncontrol, Nout, Ny, Nu)
 %[H, F, Sx, Su, Sdu, Qlinha, Rlinha, Clinha] = setpoint_deltaU_matrices_cost_function(A, B, C, Q, R, Nstate, Ncontrol, Nout, Ny, Nu)
 %
 %Return de matrices H and F from the reformulated cost function with U to
@@ -42,19 +42,7 @@ function [H, F, Sx, Su, Sdu, Qlinha, Rlinha, Clinha] = setpoint_deltaU_matrices_
         Su = [Su; Su_temp];
     end
     
-%     Sdu = zeros(Nstate,Ncontrol*Nu);
-%     
-%     for i = 2:(Ny+1)
-%         for j = 1:Nu
-%             Sdu_temp = zeros(Nstate,Ncontrol);
-%             for k = 0:(k-2)
-%                 Sdu_temp = Su_temp + (A^k)*B;
-%             end
-%             Sdu = [Su; Su_temp];
-%         end
-%     end
-    
-    Sdu = zeros((Ny+1)*Nstate,Nu);
+        Sdu = zeros((Ny+1)*Nstate,Nu);
     for j = 1:Nu
         for i = 1:(Ny+1)
             if (i-j-1)>0
@@ -64,14 +52,48 @@ function [H, F, Sx, Su, Sdu, Qlinha, Rlinha, Clinha] = setpoint_deltaU_matrices_
                 end
                 Sdu((Nstate*(i-1)+1):(Nstate*i),(Ncontrol*(j-1)+1):(Ncontrol*j)) =  [Sdu_temp];
             elseif (i-j-1) == 0
-               Sdu((Nstate*(i-1)+1):(Nstate*(i)),(Ncontrol*(j-1)+1):(Ncontrol*j)) = [B];
+                Sdu((Nstate*(i-1)+1):(Nstate*(i)),(Ncontrol*(j-1)+1):(Ncontrol*j)) = [B];
             end
         end
     end
     
+   
+    Qlinha = Q;
+    Rulinha = Ru;
+    Rdulinha = Rdu;
+    Clinha = C;
+    I_ref = eye(Nout);
+    I_u = eye(Ncontrol);
     
-    H=1; F=1;Qlinha=1; Rlinha=1; Clinha=1;
-
-
+    for i = 1:Ny
+        Qlinha = blkdiag(Qlinha,Q);
+        Clinha = blkdiag(Clinha,C);
+        I_ref = [I_ref; eye(Nout)];
+    end
+    
+    for i = 1:(Nu-1)
+        Rulinha = blkdiag(Rulinha,Ru);
+        Rdulinha = blkdiag(Rdulinha,Rdu);
+        I_u = [I_u; eye(Ncontrol)];
+    end
+    
+    T_du = [];
+    for i = 1:Nu
+        T_du_temp = [];
+        for j = 1:Nu
+            if j <= i
+                T_du_temp = [T_du_temp eye(Ncontrol)];
+            else
+                T_du_temp = [T_du_temp zeros(Ncontrol)];
+            end
+        end
+        T_du = [T_du; T_du_temp];
+    end
+   
+    H =  T_du'*Rulinha*T_du + Rdulinha + Sdu'*Clinha'*Qlinha*Clinha*Sdu;
+    F = [Sx'*Clinha'*Qlinha*Clinha*Sdu;
+         Su'*Clinha'*Qlinha*Clinha*Sdu + I_u'*Rulinha*T_du;
+        -I_ref'*Qlinha*Clinha*Sdu];
+    
 end
 

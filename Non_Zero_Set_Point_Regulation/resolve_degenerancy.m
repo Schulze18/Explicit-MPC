@@ -63,7 +63,7 @@ function  [ G_tio, W_tio, S_tio, index, flag] = resolve_degenerancy(G, W, S, H, 
             options.verbose = 0;
             options.cachesolvers = 1;
             
-            options.sdpt3.maxit = 20;
+            options.sdpt3.maxit = 100;
             options.sdpt3.steptol = 1.0000e-05;
             options.sdpt3.gaptol = 5.000e-5;
             

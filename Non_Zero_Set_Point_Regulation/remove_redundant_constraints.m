@@ -29,28 +29,50 @@ function [A_new, b_new, type_new, origem_new] = remove_redundant_constraints(A, 
 % % %         options.solver = 'sedumi';
         options.verbose = 0;
         options.cachesolvers = 1;
-% % %%Sedumi
-% % %         options.sedumi.cg.stagtol = 5.000e-4;
-% % %         options.sedumi.eps = 1.0000e-04;
-% % %         options.sedumi.maxiter = 15;
-% %  
-% % %%SDPT3
-        options.sdpt3.maxit = 20;
-        options.sdpt3.steptol = 1.0000e-05;
-        options.sdpt3.gaptol = 5.000e-5;
-
-% % %%Linprog
-%         options.linprog.TolCon = 1e-8;
-%         options.linprog.TolFun = 1e-8;
-
-        diagnostics = optimize(LMI,-objetivo,options);
-   
+% % % % %%Sedumi
+% % % % %         options.sedumi.cg.stagtol = 5.000e-4;
+% % % % %         options.sedumi.eps = 1.0000e-04;
+% % % % %         options.sedumi.maxiter = 15;
+% % % %  
+% % % % %%SDPT3
+%         options.sdpt3.maxit = 30;
+%         options.sdpt3.steptol = 1.0000e-5;
+%         options.sdpt3.gaptol = 5.000e-5;
+% % 
+% % % % %%Linprog
+% % %         options.linprog.TolCon = 1e-8;
+% % %         options.linprog.TolFun = 1e-8;
+% % 
+        optimize(LMI,-objetivo,options);
+        
         if(double(objetivo) <= b(i))
             index = [index, i];
         end
         
+        
+        
         %%%%%%%%%%%%%%
-  
+%%linprog
+% %     f = -double(A(i,:)');
+% %     A_ineq = double(A);
+% %     b_ineq = double(b);
+% %     b_ineq(i) = double(b_ineq(i)+1);
+% %     options = optimoptions('linprog','Algorithm','dual-simplex');
+% %     [x,fval,flag,output] =linprog(f,A_ineq,b_ineq,[],[],[],[],[],options);
+% %     x =  double(x);
+% %     if(output.constrviolation>0)
+% %         rank(A_ineq)
+% %         size(A_ineq)
+% %         disp('conts violation');
+% %     end
+% % %     if (output.cgiterations>0)
+% % %         disp('talvez,ruim');
+% % %     end
+% %     if(double(x)*A(i,:) <= b(i))
+% %             index = [index, i];
+% %     end    
+        
+        %%%%%%%%%%%%%%%%
         
 %         
 %         A_ineq = [];

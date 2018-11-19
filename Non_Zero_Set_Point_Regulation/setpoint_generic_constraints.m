@@ -48,22 +48,6 @@ function  [G, W, E, S, num_Gu] = setpoint_generic_constraints(Sx, Su, Clinha, H,
         W_u = [W_u; W_u_nu_max];
         E_u = [E_u; E_u_nu_max];
         
-%         G_u = G_u_max;
-%         W_u = W_u_max;
-%         E_u = E_u_max;
-
-%         G_u = [eye(Nu*Ncontrol);
-%               -eye(Nu*Ncontrol)];
-%           
-%         W_u = eye(Ncontrol)*U_max;
-%         for i = 1:(Nu-1)
-%             W_u = [W_u; eye(Ncontrol)*U_max];
-%         end
-%         for i = 1:Nu
-%             W_u = [W_u; -eye(Ncontrol)*U_min];
-%         end
-%         
-%         E_u = zeros(2*Ncontrol*Nu,Nstate + Nout);
     end
     
     if isempty(U_min) == 0

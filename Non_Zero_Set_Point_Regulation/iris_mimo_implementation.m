@@ -1,5 +1,5 @@
 %Explicit MPC for Iris 3DR Quadcopter for z,theta,phi and psi control
-% close all
+close all
 
 %Iris 3DR Parameters
 g = 9.81;
@@ -54,6 +54,8 @@ Nsim = 5000;
 x = zeros(Nstate,Nsim);
 y = zeros(Nout,Nsim);
 u = y;
+deltau = y;
+
 vet_index = zeros(1,Nsim);
 erro = zeros(Nout,Nsim);
 t = (0:(Nsim-1))*Ts;
@@ -63,15 +65,45 @@ vetor_repeticao = zeros(1,Nsim);
 
 for i = 1:Nsim
     if i < (Nsim/2)
-        ref(:,i) = [1 0.3 0.2 -0.1]';
+        ref(:,i) = [2 0 0 0]';
     else
-        ref(:,i) = [5 -0.3 0.5 0.1]';
+        ref(:,i) = [3 0 0 0]';
     end
 end  
 %%
 
-for i = 1:Nsim
-     index = 0;
+for i = 2:Nsim
+    
+% %     %U Controller
+% %     index = 0;
+% %     y(:,i) = C*x(:,i); 
+% %     erro(:,i) = ref(:,i) - y(:,i); 
+% %     cont_reg(i) = 0;
+% %     for j = 1:size(Regions,1)
+% %         A_CRi = Regions{j,1};
+% %         b_CRi = Regions{j,2};
+% %         flag = 0;       
+% %         for k = 1:size(A_CRi,1)          
+% %             if((A_CRi(k,:)*[x(:,i); ref(:,i)]) > b_CRi(k))
+% %                 flag = 1;
+% %             end
+% %         end
+% %         if flag == 0
+% %             cont_reg(i) = cont_reg(i) + 1;
+% %             index = j;
+% %         end
+% %     end
+% %    
+% %     vet_index(i) = index;
+% %     u_calc = Regions{index,3}*[x(:,i); ref(:,i)] + Regions{index,4};
+% % % 
+% %      %u_calc = test_toolbox_5_5([x(:,i); ref]);
+% % %    u_calc = expmpc.evaluate([x(:,i); ref]);
+% % 
+% %     u(:,i) = u_calc(:,1);
+    
+    %Delta U Controller
+    index = 0;
     y(:,i) = C*x(:,i); 
     erro(:,i) = ref(:,i) - y(:,i); 
     cont_reg(i) = 0;
@@ -80,7 +112,7 @@ for i = 1:Nsim
         b_CRi = Regions{j,2};
         flag = 0;       
         for k = 1:size(A_CRi,1)          
-            if((A_CRi(k,:)*[x(:,i); ref(:,i)]) > b_CRi(k))
+            if((A_CRi(k,:)*[x(:,i); u(:,i-1); ref(:,i)]) > b_CRi(k))
                 flag = 1;
             end
         end
@@ -89,21 +121,19 @@ for i = 1:Nsim
             index = j;
         end
     end
+   
     vet_index(i) = index;
-    u_calc = Regions{index,3}*[x(:,i); ref(:,i)] + Regions{index,4};
-% 
-     %u_calc = test_toolbox_5_5([x(:,i); ref]);
-%    u_calc = expmpc.evaluate([x(:,i); ref]);
-
-    u(:,i) = u_calc(:,1);
+    deltau_calc = Regions{index,3}*[x(:,i); u(:,i-1); ref(:,i)] + Regions{index,4};
     
-%     u_calc = test_toolbox_10_10([x(:,i); ref ]);
-%     u(i) = u_calc(1);
+    deltau(:,i) = deltau_calc(:,1);
+    u(:,i) = u(:,i-1) + deltau(:,i);
+    
     x(:,i+1) = A*x(:,i) + B*u(:,i);% + 0.1*[rand(1)-rand(1) ; rand(1)-rand(1)];
 
 end
 
 %%
+%%%%%Plot Saidas - Y
 figure
 subplot(Nout,1,1)
 plot(t,y(1,:))
@@ -129,19 +159,128 @@ hold on
 plot(t,ref(4,:),'-r')
 legend('Psi','Referencia')
 
+%%%%%Plot Ações de Controle - U
 figure
 subplot(Ncontrol,1,1)
 plot(t,u(1,:),'-b')
+hold on
+if (isempty(U_max) == 0) 
+    if(U_max(1) ~= Inf)
+        plot(t,U_max(1)*ones(1,Nsim),'-r')
+    end
+end
+if (isempty(U_min) == 0)
+    if(U_min(1) ~= -Inf)
+        plot(t,U_min(1)*ones(1,Nsim),'-r')
+    end
+end
+title('U')
 legend('Empuxo')
 
 subplot(Ncontrol,1,2)
-plot(t,u(2,:),'-r')
+plot(t,u(2,:),'-g')
+hold on
+if (isempty(U_max) == 0)
+    if(U_max(2) ~= Inf)
+        plot(t,U_max(2)*ones(1,Nsim),'-r')
+    end
+end
+if (isempty(U_max) == 0)
+    if(U_min(2) ~= -Inf)
+        plot(t,U_min(2)*ones(1,Nsim),'-r')
+    end
+end
 legend('Torque Phi')
 
 subplot(Ncontrol,1,3)
 plot(t,u(3,:),'-k')
+hold on
+if (isempty(U_max) == 0)
+    if(U_max(3) ~= Inf)
+        plot(t,U_max(3)*ones(1,Nsim),'-r')
+    end
+end
+if (isempty(U_max) == 0)
+    if(U_min(3) ~= -Inf)
+        plot(t,U_min(3)*ones(1,Nsim),'-r')
+    end
+end
 legend('Torque Theta')
 
 subplot(Ncontrol,1,4)
 plot(t,u(4,:),'-m')
+hold on
+if (isempty(U_max) == 0) 
+    if(U_max(4) ~= Inf)
+        plot(t,U_max(4)*ones(1,Nsim),'-r')
+    end
+end
+if (isempty(U_max) == 0) 
+    if(U_min(4) ~= -Inf)
+        plot(t,U_min(4)*ones(1,Nsim),'-r')
+    end
+end
 legend('Torque Psi')
+
+%%%%%Plot Variação das Ações de Controle - Delta U
+figure
+subplot(Ncontrol,1,1)
+plot(t,deltau(1,:),'-b')
+hold on
+if (isempty(deltaU_max) == 0)
+    if (deltaU_max(1) ~= Inf)
+       plot(t,deltaU_max(1)*ones(1,Nsim),'-r')
+    end
+end
+if (isempty(deltaU_min) == 0)
+    if(deltaU_min(1) ~= -Inf)
+        plot(t,deltaU_min(1)*ones(1,Nsim),'-r')
+    end
+end
+title('Delta U')
+legend('Delta Empuxo')
+
+subplot(Ncontrol,1,2)
+plot(t,deltau(2,:),'-g')
+hold on
+if (isempty(deltaU_max) == 0)
+    if(deltaU_max(2) ~= Inf)
+        plot(t,deltaU_max(2)*ones(1,Nsim),'-r')
+    end
+end
+if (isempty(deltaU_min) == 0)
+    if(deltaU_min(2) ~= -Inf)
+        plot(t,deltaU_min(2)*ones(1,Nsim),'-r')
+    end
+end
+legend('Delta Torque Phi')
+
+subplot(Ncontrol,1,3)
+plot(t,deltau(3,:),'-k')
+hold on
+if (isempty(deltaU_max) == 0) 
+    if(deltaU_max(3) ~= Inf)
+        plot(t,deltaU_max(3)*ones(1,Nsim),'-r')
+    end
+end
+if (isempty(deltaU_min) == 0)
+    if(deltaU_min(3) ~= -Inf)
+        plot(t,deltaU_min(3)*ones(1,Nsim),'-r')
+    end
+end
+legend('Delta Torque Theta')
+
+subplot(Ncontrol,1,4)
+plot(t,deltau(4,:),'-m')
+hold on
+if (isempty(deltaU_max) == 0)
+    if(deltaU_max(4) ~= Inf)
+        plot(t,deltaU_max(4)*ones(1,Nsim),'-r')
+    end
+end
+if (isempty(deltaU_min) == 0)
+    if(deltaU_min(4) ~= -Inf)
+        plot(t,deltaU_min(4)*ones(1,Nsim),'-r')
+    end
+end
+legend('Delta Torque Psi')
