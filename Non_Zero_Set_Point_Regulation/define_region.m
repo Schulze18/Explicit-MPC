@@ -28,9 +28,12 @@ function [A, b, type, origem] = define_region(G, W, S, G_tio, W_tio, S_tio, H, t
     b = [];
     type = [];
     
+    
     %Indica que as restrições geradas pela eq 13 nao estao relacionadas a
     %nenhum outro indice, não é exatamente isso, mas facilita o algoritmo
-    origem = zeros(size(A_2,1),1);
+    
+    %origem = zeros(size(A_2,1),1);
+    origem = [];
     
     for i = 1:size(A_2,1)
         flag = 0;
@@ -45,6 +48,7 @@ function [A, b, type, origem] = define_region(G, W, S, G_tio, W_tio, S_tio, H, t
             A = [A; A_2(i,:)];
             b = [b; b_2(i,:)];
             type = [type ; 2];
+            origem = [origem; i];
         end
    
     end

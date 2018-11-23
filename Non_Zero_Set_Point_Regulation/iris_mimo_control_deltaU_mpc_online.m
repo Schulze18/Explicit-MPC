@@ -1,5 +1,5 @@
-%Explicit MPC for Iris 3DR Quadcopter for z,theta,phi and psi control
-close all
+%MPC Online
+clc
 
 %Iris 3DR Parameters
 g = 9.81;
@@ -41,15 +41,51 @@ Cc = [1 0 0 0 0 0 0 0;
      0 0 0 0 0 0 1 0];
 
  %Discrete State Space
- [A,B]= c2d(Ac,Bc,Ts);
- C = Cc;
+[A,B]= c2d(Ac,Bc,Ts);
+C = Cc;
  
- Nstate = size(A,1);
- Ncontrol = size(B,2);
- Nout = size(C,1);
- Nref = Nout;
+Nstate = size(A,1);
+Ncontrol = size(B,2);
+Nout = size(C,1);
+Nref = Nout;
  
+%Explicit MPC Parameters
+Q = diag([3,1,1,1]);
+Ru = 0.2*diag([0.001,0.01,0.01,0.01]);
+Rdu = 0.5*diag([0.005,0.05,0.05,0.05]);
+% % % Q = diag([0.7/10^2, 0.1/0.5^2, 0.1/0.5^2 0.1/0.5^2]);
+% % % Ru = 0.01*diag([0.7/(2*m*g)^2, 0.1, 0.1, 0.1]);
+% % % Rdu = 0.01*diag([0.7/(8*m)^2, 0.1/0.1^2, 0.1/0.1^2, 0.1/0.1^2]);
+
+Ny = 5;
+Nu = 5;
+
+deltaU_max = [8*m Inf Inf Inf]';
+deltaU_min = [-4*m -Inf -Inf -Inf]';
  
+U_max = [2*m*g Inf Inf Inf]';
+U_min = [-m*g -Inf -Inf -Inf];
+ 
+Ref_max = [];%[30 Inf Inf Inf]';
+Ref_min = [];%[-1 -Inf -Inf -Inf]';
+ 
+X_max = [];%[Inf 1 2 Inf Inf Inf Inf Inf]';
+X_min = [];%-[Inf 10 Inf Inf Inf Inf Inf Inf]';
+
+Y_max = [];%[10 Inf Inf Inf]';
+Y_min = [];%[-1.5 -Inf -Inf -Inf]';
+ 
+% Code parameters
+tol = 1e-7;
+n_plot = 20;
+last_plot = 0;
+ 
+%%
+[H, F, Sx, Su, Sdu, T_du, Qlinha, Rulinha, Rdulinha, Clinha] = setpoint_deltaU_matrices_cost_function(A, B, C, Q, Ru, Rdu, Nstate, Ncontrol, Nout, Ny, Nu);
+
+[G, W, E, S, num_Gu] = setpoint_deltaU_generic_constraints(Sx, Su, Sdu, Clinha, H, F, Nstate, Ncontrol, Nout, Nref, Ny, Nu, deltaU_max, deltaU_min, U_max, U_min, Ref_max, Ref_min, X_max, X_min, Y_max, Y_min);
+
+%%
 Nsim = 5000;
 x = zeros(Nstate,Nsim);
 y = zeros(Nout,Nsim);
@@ -66,78 +102,31 @@ ref = zeros(4,Nsim);
 
 for i = 1:Nsim
     if i < (Nsim/2)
-        ref(:,i) = [60 0 0 0]';
+        ref(:,i) = [10 0 0 0]';
     else
-        ref(:,i) = [120 0 0 0]';
+        ref(:,i) = [10 0 0 0]';
     end
 end  
-%%
-ruim = {};
+
+
+options = optimoptions('quadprog','Display','None');
 for i = 2:Nsim
-    
-% %     %U Controller
-% %     index = 0;
-% %     y(:,i) = C*x(:,i); 
-% %     erro(:,i) = ref(:,i) - y(:,i); 
-% %     cont_reg(i) = 0;
-% %     for j = 1:size(Regions,1)
-% %         A_CRi = Regions{j,1};
-% %         b_CRi = Regions{j,2};
-% %         flag = 0;       
-% %         for k = 1:size(A_CRi,1)          
-% %             if((A_CRi(k,:)*[x(:,i); ref(:,i)]) > b_CRi(k))
-% %                 flag = 1;
-% %             end
-% %         end
-% %         if flag == 0
-% %             cont_reg(i) = cont_reg(i) + 1;
-% %             index = j;
-% %         end
-% %     end
-% %    
-% %     vet_index(i) = index;
-% %     u_calc = Regions{index,3}*[x(:,i); ref(:,i)] + Regions{index,4};
-% % % 
-% %      %u_calc = test_toolbox_5_5([x(:,i); ref]);
-% % %    u_calc = expmpc.evaluate([x(:,i); ref]);
-% % 
-% %     u(:,i) = u_calc(:,1);
-    
-    %Delta U Controller
     index = 0;
     y(:,i) = C*x(:,i); 
     erro(:,i) = ref(:,i) - y(:,i); 
-    cont_reg(i) = 0;
-    for j = 1:size(Regions,1)
-        A_CRi = Regions{j,1};
-        b_CRi = Regions{j,2};
-        flag = 0;       
-        for k = 1:size(A_CRi,1)
-%             if isnan((A_CRi(k,:)*[x(:,i); u(:,i-1); ref(:,i)]))
-%                 i
-%                 disp('ruim');
-%             end
-            if(((A_CRi(k,:)*[x(:,i); u(:,i-1); ref(:,i)]) > (b_CRi(k))))% || ( (isnan((A_CRi(k,:)*[x(:,i); u(:,i-1); ref(:,i)])))==1))
-                flag = 1;
-            end
-        end
-        if flag == 0
-            cont_reg(i) = cont_reg(i) + 1;
-            index = j;
-            if (cont_reg(i) > 1)
-                j
-            end
-        end
-    end
+    
+    f_quad = F'*[x(:,i); u(:,i-1); ref(:,i)];
+    H_quad = H;
+    A_ineq = G;
+    b_ineq = W + E*[x(:,i); u(:,i-1); ref(:,i)];
    
-    vet_index(i) = index;
-    deltau_calc = Regions{index,3}*[x(:,i); u(:,i-1); ref(:,i)] + Regions{index,4};
+    delta_u_calc = quadprog(H_quad, f_quad, A_ineq, b_ineq,[],[],[],[],[],options);
     
-    deltau(:,i) = deltau_calc(:,1);
+    deltau(:,i) = double(delta_u_calc(1:Ncontrol,1));
+    
     u(:,i) = u(:,i-1) + deltau(:,i);
+    x(:,i+1) = A*x(:,i) + B*u(:,i);
     
-    x(:,i+1) = A*x(:,i) + B*u(:,i);% + 0.1*[rand(1)-rand(1) ; rand(1)-rand(1)];
-
 end
 
 %%
