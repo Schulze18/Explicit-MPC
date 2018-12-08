@@ -62,8 +62,8 @@ Q = diag([3,1,1,1]);
 Ru = 0.2*diag([0.001,0.01,0.01,0.01]);
 Rdu = 0.5*diag([0.005,0.05,0.05,0.05]);
 
-Ny = 5;
-Nu = 5;
+Ny = 10;
+Nu = 10;
 
 deltaU_max = [8*m Inf Inf Inf]';
 deltaU_min = [-4*m -Inf -Inf -Inf]';

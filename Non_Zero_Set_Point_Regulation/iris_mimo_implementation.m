@@ -66,9 +66,9 @@ ref = zeros(4,Nsim);
 
 for i = 1:Nsim
     if i < (Nsim/2)
-        ref(:,i) = [60 0 0 0]';
+        ref(:,i) = [10 0 0 0]';
     else
-        ref(:,i) = [120 0 0 0]';
+        ref(:,i) = [1 0 0 0]';
     end
 end  
 %%

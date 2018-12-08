@@ -1,4 +1,4 @@
-function  [ G_tio, W_tio, S_tio, index, flag] = resolve_degenerancy(G, W, S, H, F, A, b, Nstate, Ncontrol, Nout, Ny, Nu, Lcand, tol)
+function  [ G_tio, W_tio, S_tio, index, flag, flag_x_nan] = resolve_degenerancy(G, W, S, H, F, A, b, Nstate, Ncontrol, Nout, Ny, Nu, Lcand, tol, last_cand)
 %UNTITLED2 Summary of this function goes here 
 %   Detailed explanation goes here
     %%%Reconstroi Região que originou a que esta sendo avaliada
@@ -27,10 +27,12 @@ function  [ G_tio, W_tio, S_tio, index, flag] = resolve_degenerancy(G, W, S, H, 
     S_tio = [];
 
     [xc , r, diagnostics] = chebychev_ball(A, b, G, W, S, H, F, Nstate, Ncontrol, Nout, Ny, Nu);
-
+    
+    flag_x_nan = 0;
     for i = 1:size(xc,1)
         if isnan(xc(i))
             xc(i) = 0;
+            flag_x_nan = 1;
         end
     end
     
@@ -46,11 +48,18 @@ function  [ G_tio, W_tio, S_tio, index, flag] = resolve_degenerancy(G, W, S, H, 
                 G_test = [G_test ; G(Lcand(i),:)];
             end
             
+            %Find index from 
+            for i = 1:length(Lcand)
+                if Lcand(i) == last_cand
+                    index_last_cand = i;
+                end
+            end
             
             %Equacao 18, 19 e 20
             lambda = sdpvar(length(Lcand),1,'full');
             
-            objective = -lambda(end);
+            %%%%%%objective = -lambda(end);
+            objective = -lambda(index_last_cand);
             LMI = [];
             LMI = [LMI; H*z0 + G_test'*lambda == 0];
             LMI = [LMI; lambda >= 0];
@@ -69,7 +78,8 @@ function  [ G_tio, W_tio, S_tio, index, flag] = resolve_degenerancy(G, W, S, H, 
             
             
             diagnostics = optimize(LMI,objective,options);
-            
+%             check(LMI)
+%             double(lambda)
             
             if diagnostics.problem > 0
                 flag = 1;
@@ -80,7 +90,8 @@ function  [ G_tio, W_tio, S_tio, index, flag] = resolve_degenerancy(G, W, S, H, 
                 for i = 1:length(Lcand)
                     if lambda(i) == Inf
                         flag = 1;
-                    elseif lambda(i) > 0
+                    %elseif lambda(i) > 0
+                    elseif lambda(i) > tol
                         index = [index; Lcand(i)];
                         G_tio = [G_tio; G(Lcand(i),:)];
                         S_tio = [S_tio; S(Lcand(i),:)];
