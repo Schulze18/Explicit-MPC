@@ -1,4 +1,4 @@
-function [ ineq_out ] = which_region_ineq(ineq, Regions)
+function [ ineq_out ] = which_region_ineq(ineq, Regions,tol)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -28,9 +28,12 @@ function [ ineq_out ] = which_region_ineq(ineq, Regions)
                         %Verify if it is a new control law
                         flag_new_control = 1;
                         for n = 1:size(ineq_out{i,4},1)
-                            if isequal(ineq_out{i,4}{n,1},Regions{j,3}) && isequal(ineq_out{i,4}{n,2},Regions{j,4})
-                                flag_new_control = 0;
-                            end
+% %                             if isequal(ineq_out{i,4}{n,1},Regions{j,3}) && isequal(ineq_out{i,4}{n,2},Regions{j,4})
+% %                                 flag_new_control = 0;
+% %                             end
+                              if verify_equal_matrices(ineq_out{i,4}{n,1},Regions{j,3},tol) && verify_equal_matrices(ineq_out{i,4}{n,2},Regions{j,4},tol)
+                                    flag_new_control = 0;
+                              end
                         end
                         if flag_new_control
                             ineq_out{i,4}{end+1,1} = Regions{j,3};

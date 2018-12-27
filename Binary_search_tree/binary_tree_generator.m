@@ -1,23 +1,26 @@
 clear all
 clc
+tol = 1e-6;
 
-load('regions_10_2_u.mat');
+load('regions_10_2_u_du.mat');
 %Step 1 - Algorithm 2 - Computation all the I(j+) and I(j-)
 ineq_pos = verifiy_total_ineq(Regions);
 ineq_neg = cellfun(@(x) x*(-1),ineq_pos,'un',0);
 
 
 %%
-ineq_test = which_region_ineq(ineq_pos,Regions);
+ineq_test = which_region_ineq(ineq_pos,Regions,tol);
 
 %%
+tic
 for i = 1:size(ineq_pos,1)
+    i
     for j = 1:size(Regions,1)
         result = side_ineq_region(ineq_pos(i,:),Regions(j,:));
         ineq_pos{i,6}(j,1) = result;
     end
 end
-
+toc
 %%
 tic
 clear nodes
@@ -53,14 +56,15 @@ nodes{1,7} = [];                    %parent node
 
 %%
 
-it_max = 500;
+it_max = 100;
 it = 0;
-while isempty(unex_node) == 0% && it < it_max 
+while isempty(unex_node) == 0 && it < it_max 
     it = it + 1;
     
     index_node = unex_node(end,1);
     
 %     %Define inequation to test
+
 %     index_ineq = rem(index_node,size(ineq_pos,1));
 %     if index_ineq == 0
 %         index_ineq = size(ineq_pos,1);
@@ -75,6 +79,7 @@ while isempty(unex_node) == 0% && it < it_max
             if flag_new_ineq == 1
                 break
             end
+            %Verify inequation "not used" that define a Region 
             for k = 1:size(ineq_pos{j,3},1)
                 if (ineq_pos{j,3}(k,1) == nodes{index_node,4}(i,1)) && (ismember(j,nodes{index_node,3}) == 0)%j ~= last_index_ineq
                     last_index_ineq = index_ineq;
@@ -104,7 +109,7 @@ while isempty(unex_node) == 0% && it < it_max
     nodes{nodes{index_node,5},7} =  index_node;
     nodes{nodes{index_node,6},7} =  index_node;
     
-    %Save inequation from the branch
+    %Save inequations from the branch
     nodes{nodes{index_node,5},3} = [nodes{index_node,3}];
     nodes{nodes{index_node,6},3} = [nodes{index_node,3}];
     

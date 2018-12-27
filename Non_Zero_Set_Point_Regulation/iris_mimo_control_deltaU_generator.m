@@ -63,10 +63,10 @@ Ru = 0.2*diag([0.001,0.01,0.01,0.01]);
 Rdu = 0.5*diag([0.005,0.05,0.05,0.05]);
 
 Ny = 10;
-Nu = 10;
+Nu = 2;
 
-deltaU_max = [8*m Inf Inf Inf]';
-deltaU_min = [-4*m -Inf -Inf -Inf]';
+deltaU_max = []%[8*m Inf Inf Inf]';
+deltaU_min = []%[-4*m -Inf -Inf -Inf]';
  
 U_max = [2*m*g Inf Inf Inf]';
 U_min = [-m*g -Inf -Inf -Inf];
