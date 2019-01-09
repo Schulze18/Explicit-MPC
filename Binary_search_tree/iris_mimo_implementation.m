@@ -74,7 +74,7 @@ end
 %%
 ruim = {};
 for i = 2:Nsim
-    
+    i
 % %     %U Controller
 % %     index = 0;
 % %     y(:,i) = C*x(:,i); 
@@ -140,8 +140,14 @@ for i = 2:Nsim
     vet_index(1,i) = index;
     vet_index(2,i) = num_operation;
     
-    [vet_index_bst(1,i) vet_index_bst(2,i)] = evaluate_region_BST([x(:,i); u(:,i-1); ref(:,i)],nodes);
+    [vet_index_bst(1,i) vet_index_bst(2,i)] = evaluate_region_BST([x(:,i); u(:,i-1); ref(:,i)], nodes);
     index = vet_index_bst(1,i);
+    
+    if index ~= 0
+        old_index = index;
+    else
+        index = old_index;
+    end
     
     deltau_calc = Regions{index,3}*[x(:,i); u(:,i-1); ref(:,i)] + Regions{index,4};
     

@@ -15,6 +15,11 @@ function [index_region, num_operations] = evaluate_region_BST(x,nodes)
             index_node = nodes{index_node,6};
         end
     end
-    index_region = nodes{index_node,4};
-end
+    disp('test')
+    if isempty(nodes{index_node,4})
+        index_region = 0;
+    else
+        index_region = nodes{index_node,4}(1,1);
+    end
+ end
 

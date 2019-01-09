@@ -49,8 +49,8 @@ function [result, diagnostics1, diagnostics2] = side_ineq_region(ineq, Region)
 %         options.sdpt3.steptol = 1.0000e-08;
 %         options.sdpt3.gaptol = 5.000e-8;
         
-        options.sedumi.eps = 5.0000e-05;
-        options.sedumi.maxiter = 50;
+        options.sedumi.eps = 5.0000e-04;
+        options.sedumi.maxiter = 20;
 
 
         A_region = Region{1,1};
@@ -68,11 +68,11 @@ function [result, diagnostics1, diagnostics2] = side_ineq_region(ineq, Region)
         end
 
         %Check >= sign
-        x = sdpvar(size(A_ineq,2),1,'full');
-        objective2 = -(A_ineq*x - b_ineq);
+        x2 = sdpvar(size(A_ineq,2),1,'full');
+        objective2 = -(A_ineq*x2 - b_ineq);
         LMI2 = [];
         for i = 1:size(A_region,1)
-            LMI2 = [LMI2; A_region(i,:)*x <= b_region(i,:)-tol];
+            LMI2 = [LMI2; A_region(i,:)*x2 <= b_region(i,:)-tol];
         end
 
         diagnostics2 = optimize(LMI2,objective2,options);
