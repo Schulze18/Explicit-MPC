@@ -1,4 +1,4 @@
-function [ index_ineq, num_min, flag_ineq_region ] = define_inequation_node_less(nodes, index_node, set_ineq, branch_index, controls)
+function [ index_ineq, num_min, flag_ineq_region ] = define_inequation_node_less(nodes, index_node, set_ineq, branch_index, controls, Regions, tol)
 %UNTITLED5 Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -39,6 +39,7 @@ function [ index_ineq, num_min, flag_ineq_region ] = define_inequation_node_less
     for i = 1:size(set_new_index_ineq,1)
         set_test_index = [branch_index; set_new_index_ineq(i)];
         side_set_test_index = [nodes{index_node,8}; 1];
+        set_new_regions = {}; %%%
         for j = 1:size(nodes{index_node,4},1)
             
             flag_new_region = 1;
@@ -48,17 +49,24 @@ function [ index_ineq, num_min, flag_ineq_region ] = define_inequation_node_less
                     flag_new_region = 0;
                 end
             end
-            if flag_new_region == 1
-                number_controls_less_equal(i) = number_controls_less_equal(i) + 1;
-            end
-            
+            if flag_new_region == 1 %%%%%%%%%%55
+                number_controls_less_equal(i) = number_controls_less_equal(i) + 1;  %%%%%%%%%%55
+            end%%%%%%%%%%55
+% % %             if flag_new_region == 1
+% % %                 %set_new_regions = [set_new_regions; nodes{index_node,4}(j,1)];
+% % %                 set_new_regions = [set_new_regions; Regions(nodes{index_node,4}(j,1),:)];
+% % %             end
         end
+% % %         set_controls_node = simplified_list_control_laws(set_new_regions,tol);
+% % %         
+% % %         number_controls_less_equal(i) = size(set_controls_node,1); %%%
     end
     
     %Greater Side
     for i = 1:size(set_new_index_ineq,1)
         set_test_index = [branch_index; set_new_index_ineq(i)];
         side_set_test_index = [nodes{index_node,8}; 2];
+        set_new_regions = {}; %%%
         for j = 1:size(nodes{index_node,4},1)
             
             flag_new_region = 1;
@@ -68,11 +76,18 @@ function [ index_ineq, num_min, flag_ineq_region ] = define_inequation_node_less
                     flag_new_region = 0;
                 end
             end
-            if flag_new_region == 1
-                number_controls_greater_equal(i) = number_controls_greater_equal(i) + 1;
-            end
-            
+            if flag_new_region == 1 %%%%%%%%%%55
+                number_controls_greater_equal(i) = number_controls_greater_equal(i) + 1; %%%%%%%%%%55
+            end %%%%%%%%%%55
+% % % %             if flag_new_region == 1
+% % % %                  %Regions_remaining = [Regions_remaining; Regions(nodes{index_node,4}(i,1),:)];
+% % % %                  set_new_regions = [set_new_regions; Regions(nodes{index_node,4}(j,1),:)];
+% % % %             end
         end
+% % % %         set_controls_node = simplified_list_control_laws(set_new_regions,tol);
+% % % %         
+% % % %         number_controls_greater_equal(i) = size(set_controls_node,1); %%%
+
     end
     
     
@@ -129,24 +144,10 @@ function [ index_ineq, num_min, flag_ineq_region ] = define_inequation_node_less
     if index_min > 0
         index_ineq = index_min;
     else
-% % % % % %     if index_max > 0
-% % % % % %         index_ineq = index_max;
-% % % % % %     else
         disp('deu ruimm')
-        index_ineq = set_new_index_ineq(1);     
+        index_ineq = set_new_index_ineq(1);
     end
-
-    
-    
-    
-% %     if index_max > 0
-% %         index_ineq = index_max;
-% %     else
-% %         disp('deu ruimm')
-% %         index_ineq = set_new_index_ineq(1);     
-% %     end
-    
-    
+  
     
 end
 

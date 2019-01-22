@@ -5,8 +5,8 @@ tol = 1e-6;
 load('regions_10_3_u_du.mat');
 %Step 1 - Algorithm 2 - Computation all the I(j+) and I(j-)
 %%
-ineq_pos = verifiy_total_ineq(Regions);
-%%%%%%%%%%load('ineq_10_3_u_du.mat');    
+%ineq_pos = verifiy_total_ineq(Regions);
+load('ineq_10_3_u_du.mat');    
 ineq_neg = cellfun(@(x) x*(-1),ineq_pos,'un',0);
 
 
@@ -14,15 +14,15 @@ ineq_neg = cellfun(@(x) x*(-1),ineq_pos,'un',0);
 ineq_test = which_region_ineq(ineq_pos,Regions,tol);
 
 %%
-tic
-for i = 1:size(ineq_pos,1)
-    i
-    for j = 1:size(Regions,1)
-        result = side_ineq_region(ineq_pos(i,:),Regions(j,:));
-        ineq_pos{i,6}(j,1) = result;
-    end
-end
-toc
+% % % tic
+% % % for i = 1:size(ineq_pos,1)
+% % %     i
+% % %     for j = 1:size(Regions,1)
+% % %         result = side_ineq_region(ineq_pos(i,:),Regions(j,:));
+% % %         ineq_pos{i,6}(j,1) = result;
+% % %     end
+% % % end
+% % % toc
 
 %% List all the control laws
 controls = list_control_laws(Regions, ineq_pos, tol);
@@ -80,7 +80,7 @@ while isempty(unex_node) == 0 && it < it_max
     %Define inequation to the node
     
     %%index_ineq = define_inequation_node(nodes, index_node, ineq_pos, nodes{index_node,3}, controls);
-    [index_ineq, num_max, flag_ineq_region] = define_inequation_node_less(nodes, index_node, ineq_pos, nodes{index_node,3}, controls);
+    [index_ineq, num_max, flag_ineq_region] = define_inequation_node_less(nodes, index_node, ineq_pos, nodes{index_node,3}, controls, Regions, tol);
     %index_ineq = define_inequation_node_old(nodes, index_node, ineq_pos);
     vetor_index(1,it) = index_ineq;
     %%vetor_index(2,it) = num_max;
@@ -149,8 +149,10 @@ while isempty(unex_node) == 0 && it < it_max
     for i = 1:size(nodes{index_node,4},1)
         Regions_remaining = [Regions_remaining; Regions(nodes{index_node,4}(i,1),:)];
     end
-    controls_remaining = list_control_laws(Regions_remaining, ineq_pos, tol);
+    %%controls_remaining = list_control_laws(Regions_remaining, ineq_pos, tol);
+    controls_remaining = simplified_list_control_laws(Regions_remaining,tol);
     
+    controls_remaining = 4; %%%%%%%
     %%%if size(nodes{index_node,4},1) < 4
     if size(controls_remaining,1) < 3
         for i = 1:size(nodes{index_node,4},1)
