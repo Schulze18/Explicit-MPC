@@ -1,0 +1,34 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <physics type='ode'>
+  	<max_step_size>0.01</max_step_size>
+  	<real_time_factor>1</real_time_factor>
+  	<real_time_update_rate>100</real_time_update_rate>
+    </physics>
+
+
+    <!-- A testing model that includes the Velodyne sensor model -->
+    <model name="my_iris">
+      <include>
+	<!--Pasta do Modelo-->
+        <uri>model://iris_with_standoffs</uri>
+      </include>
+	<pose>0 0 0 0 0 0</pose>
+
+      <!-- Attach the plugin to this model -->
+      <plugin name="iris_explicit_control" filename="libiris_plugin_explicit_mpc.so"/> 
+		    
+</model>
+
+  </world>
+</sdf>
