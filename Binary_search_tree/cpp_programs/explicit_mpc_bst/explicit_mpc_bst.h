@@ -29,6 +29,6 @@ void read_int_from_file(int *element, std::ifstream *file);
 void get_bst_from_file(std::vector<struct_bst> *bst_nodes , const char *filename);
 void get_regions_from_file(std::vector<struct_regions> *regions, const char *filename);
 int index_region_evaluate_bst(double state[], std::vector<struct_bst> *bst_nodes);
-double *calculate_control_explicit_bst(double state[], std::vector<struct_regions> *regions, int index_region);
+void calculate_control_explicit_bst(double *array_control_action, double state[], std::vector<struct_regions> *regions, int index_region);
 
 #endif

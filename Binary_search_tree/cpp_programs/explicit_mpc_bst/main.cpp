@@ -7,7 +7,10 @@ int main() {
 	std::vector<struct_bst> bst_nodes;
     std::vector<struct_regions> regions;
 
-	get_bst_from_file(&bst_nodes, "output_bst_nodes.txt");
+    const char hue[] = "output_bst_nodes.txt";
+	//get_bst_from_file(&bst_nodes, "output_bst_nodes.txt");
+	get_bst_from_file(&bst_nodes, hue);
+
 
     get_regions_from_file(&regions, "output_regions.txt");
 
@@ -20,13 +23,13 @@ int main() {
     int index_region = index_region_evaluate_bst(state_x, &bst_nodes);
     cout << index_region << endl;
 
-    double *control_action;
-    control_action = calculate_control_explicit_bst(state_x, &regions, index_region - 1);
+    double control_action[4];
+    calculate_control_explicit_bst(control_action, state_x, &regions, index_region - 1);
 
-   /* for (int it_control = 0; it_control <  4; it_control++)
+    for (int it_control = 0; it_control <  4; it_control++)
     {
-       // cout << *(control_action + it_control) << endl;
-    }*/
+        printf("%lf \n", control_action[it_control]);
+    }
 
 	return 0;
 }
