@@ -58,18 +58,24 @@ Nref = Nout;
 % % % %Q = diag([0.7/10^2, 0.1/0.5^2, 0.1/0.5^2 0.1/0.5^2]);
 % % % Ru = 0.01*diag([0.7/(2*m*g)^2, 0.1, 0.1, 0.1]);
 % % % Rdu = 0.01*diag([0.7/(8*m)^2, 0.1/0.1^2, 0.1/0.1^2, 0.1/0.1^2]);
-Q = diag([3,1,1,1]);
-Ru = 0.2*diag([0.001,0.01,0.01,0.01]);
+Q = diag([3,0.05,0.05,0.03]);
+Ru = 0.2*diag([0.0005,0.02,0.02,0.04]);
 Rdu = 0.5*diag([0.005,0.05,0.05,0.05]);
+% % % % % % % % % % % % Q = diag([10, 0.01, 0.01, 0.01]);
+% % % % % % % % % % % % Ru = 0.2*diag([1,100,100,100]);
+% % % % % % % % % % % % Rdu = 0.5*diag([1,100,100,100]);
 
 Ny = 10;
 Nu = 3;
 
 deltaU_max = [8*m Inf Inf Inf]';
 deltaU_min = [-4*m -Inf -Inf -Inf]';
- 
-U_max = [2*m*g Inf Inf Inf]';
-U_min = [-m*g -Inf -Inf -Inf];
+
+angle_speed_max = pi/4;
+% % U_max = [2*m*g Inf Inf Inf]';
+% % U_min = [-m*g -Inf -Inf -Inf];
+U_max = [2*m*g angle_speed_max*Ixx angle_speed_max*Iyy angle_speed_max*Izz]';
+U_min = [-m*g -angle_speed_max*Ixx -angle_speed_max*Iyy -angle_speed_max*Izz]';
  
 Ref_max = [];%[30 Inf Inf Inf]';
 Ref_min = [];%[-1 -Inf -Inf -Inf]';

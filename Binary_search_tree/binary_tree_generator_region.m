@@ -2,11 +2,13 @@ clear all
 clc
 tol = 1e-6;
 
-load('regions_10_3_u_du.mat');
+%load('regions_10_4_u_du.mat');
+load('/File_results/regions_10_3_u_du_v3.mat');
 %Step 1 - Algorithm 2 - Computation all the I(j+) and I(j-)
 %%
-%ineq_pos = verifiy_total_ineq(Regions);
-load('ineq_10_3_u_du.mat');    
+ineq_pos = verifiy_total_ineq(Regions);
+%load('ineq_10_4_u_du.mat');   
+%load('/File_results/ineq_v2_10_4_u_du.mat');
 ineq_neg = cellfun(@(x) x*(-1),ineq_pos,'un',0);
 
 
@@ -14,15 +16,15 @@ ineq_neg = cellfun(@(x) x*(-1),ineq_pos,'un',0);
 ineq_test = which_region_ineq(ineq_pos,Regions,tol);
 
 %%
-% % % tic
-% % % for i = 1:size(ineq_pos,1)
-% % %     i
-% % %     for j = 1:size(Regions,1)
-% % %         result = side_ineq_region(ineq_pos(i,:),Regions(j,:));
-% % %         ineq_pos{i,6}(j,1) = result;
-% % %     end
-% % % end
-% % % toc
+tic
+for i = 1:size(ineq_pos,1)
+    i
+    for j = 1:size(Regions,1)
+        result = side_ineq_region(ineq_pos(i,:),Regions(j,:));
+        ineq_pos{i,6}(j,1) = result;
+    end
+end
+toc
 
 %% List all the control laws
 controls = list_control_laws(Regions, ineq_pos, tol);
@@ -62,7 +64,7 @@ nodes{1,8} = [];                    %parent inequations side
 
 %%
 
-it_max = 5*1500;
+it_max = 10*1500;
 it = 0;
 while isempty(unex_node) == 0 && it < it_max 
     it = it + 1;
@@ -143,7 +145,6 @@ while isempty(unex_node) == 0 && it < it_max
     
     index_side = [];
     
-    
     %Number of control laws from the remaing regions
     Regions_remaining = {};
     for i = 1:size(nodes{index_node,4},1)
@@ -152,7 +153,8 @@ while isempty(unex_node) == 0 && it < it_max
     %%controls_remaining = list_control_laws(Regions_remaining, ineq_pos, tol);
     controls_remaining = simplified_list_control_laws(Regions_remaining,tol);
     
-    controls_remaining = 4; %%%%%%%
+    
+    %%%%%controls_remaining = 4; %%%%%%%
     %%%if size(nodes{index_node,4},1) < 4
     if size(controls_remaining,1) < 3
         for i = 1:size(nodes{index_node,4},1)

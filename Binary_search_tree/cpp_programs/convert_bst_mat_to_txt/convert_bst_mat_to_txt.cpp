@@ -1,8 +1,21 @@
 #include "convert_bst_mat_to_txt.h"
+#include "explicit_mpc_bst.h"
+#include "mat.h"
+#include <iostream>
+#include <vector>
+#include <fstream>
 
+//int number_fields_bst;
+//int number_fields_regions;
+//int max_number_ineq;
+int total_nodes;
+int total_regions;
+int number_states;
+int number_controls_actions;
 int number_fields_bst;
 int number_fields_regions;
 int max_number_ineq;
+
 
 void write_double_to_file(double *element, std::ofstream *file) {
 	(*file).write((char*)&(*element), sizeof(*element));
@@ -14,7 +27,7 @@ void write_int_to_file(int *element, std::ofstream *file) {
 
 void export_bst_to_file(std::vector<struct_bst> *bst_nodes , const char *filename){
 
-    std::ofstream file_bst(filename, ios::out | ios::binary);
+    std::ofstream file_bst(filename, std::ios::out | std::ios::binary);
 
     write_int_to_file(&total_nodes,&file_bst);
     write_int_to_file(&number_states,&file_bst);
@@ -24,7 +37,7 @@ void export_bst_to_file(std::vector<struct_bst> *bst_nodes , const char *filenam
         //Export A
         for (int it_A = 0; it_A < number_states; it_A++){
             double element_A;
-			element_A = (*bst_nodes)[index_node].A[number_A];
+			element_A = (*bst_nodes)[index_node].A[it_A];
 			write_double_to_file(&element_A,&file_bst);
         }
 
@@ -42,7 +55,7 @@ void export_bst_to_file(std::vector<struct_bst> *bst_nodes , const char *filenam
         write_int_to_file(&number_regions_node,&file_bst);
 
         //Export regions
-        for (int it_region = 0; it_region < number_regions; it_region++){
+        for (int it_region = 0; it_region < number_regions_node; it_region++){
             int element_region = (*bst_nodes)[index_node].regions[it_region];
                 write_int_to_file(&element_region,&file_bst);
         }
@@ -53,7 +66,7 @@ void export_bst_to_file(std::vector<struct_bst> *bst_nodes , const char *filenam
 
 void export_regions_to_file(std::vector<struct_regions> *regions, const char *filename){
 
-    std::ofstream file_regions(filename, ios::out | ios::binary);
+    std::ofstream file_regions(filename, std::ios::out | std::ios::binary);
 
     //Export total number of regions
     write_int_to_file(&total_regions,&file_regions);
@@ -68,7 +81,7 @@ void export_regions_to_file(std::vector<struct_regions> *regions, const char *fi
         write_int_to_file(&number_inequation_region,&file_regions);
 
         //Export inequations set A
-        for (int it_ineq = 0; it_ineq < number_inequation; it_ineq++) {
+        for (int it_ineq = 0; it_ineq < number_inequation_region; it_ineq++) {
 			for (int it_element = 0; it_element < number_states; it_element++) {
                 double element_ineq_A = (*regions)[index_region].set_A[it_ineq][it_element];
                 write_double_to_file(&element_ineq_A,&file_regions);
@@ -76,7 +89,7 @@ void export_regions_to_file(std::vector<struct_regions> *regions, const char *fi
         }
 
         //Export b
-        for (int it_ineq = 0; it_ineq < number_inequation; it_ineq++) {
+        for (int it_ineq = 0; it_ineq < number_inequation_region; it_ineq++) {
             double element_b = (*regions)[index_region].set_b[it_ineq];
             write_double_to_file(&element_b,&file_regions);
         }
@@ -99,7 +112,7 @@ void export_regions_to_file(std::vector<struct_regions> *regions, const char *fi
 void get_struct_bst_from_mat(std::vector<struct_bst> *bst_nodes , const char *filename){
     MATFile *pmat_bst;
 
-    pmat = matOpen(filename, "r");/*
+    /*pmat_bst = matOpen(filename, "r");/*
     //Get struct from the .mat file
 	mxArray *struct_node = matGetVariable(pmat, "struct_nodes");
 
@@ -120,7 +133,7 @@ void get_struct_bst_from_mat(std::vector<struct_bst> *bst_nodes , const char *fi
 
     pmat_bst = matOpen(filename, "r");
 	//Get struct from the .mat, it is maybe necessary to change the struct name
-	mxArray *struct_nodes = matGetVariable(pmat, "struct_nodes");
+	mxArray *struct_nodes = matGetVariable(pmat_bst, "struct_nodes");
 
     //Get all the data from the struct
 	mxArray **bst_elements;
@@ -134,7 +147,7 @@ void get_struct_bst_from_mat(std::vector<struct_bst> *bst_nodes , const char *fi
         (*bst_nodes).push_back(struct_bst());
 
         //Reading A inequations from .mat
-        double *A_ineq = mxGetPr(bst_elements[0 + index_node * number_fields]);
+        double *A_ineq = mxGetPr(bst_elements[0 + index_node * number_fields_bst]);
 		(*bst_nodes)[index_node].A.assign(A_ineq, A_ineq + number_states);
 
         //Reading b from .mat
@@ -206,7 +219,7 @@ void get_struct_regions_from_mat(std::vector<struct_regions> *regions, const cha
             }
 		}
 
-		int number_ineq_A = regions[index_region].set_A.size();
+		int number_ineq_A =  (*regions)[index_region].set_A.size();
 		//printf("size A region %d: %d\n", index_region+1, number_inequation);
 
 		//Reading b from .mat
@@ -215,7 +228,7 @@ void get_struct_regions_from_mat(std::vector<struct_regions> *regions, const cha
 
 		//Reading Kx from .mat
 		double *pointer_Kx = mxGetPr(element_region[2 + index_region * number_fields_regions]);
-		vector<double> temp_Kx;
+		std::vector<double> temp_Kx;
 		temp_Kx.assign(pointer_Kx, pointer_Kx + number_controls_actions * number_states);
 
 		//Logic to sort the elements in the desired order
@@ -227,7 +240,7 @@ void get_struct_regions_from_mat(std::vector<struct_regions> *regions, const cha
 
         //Reading Kc from .mat
 		double *pointer_Kc = mxGetPr(element_region[3 + index_region * number_fields_regions]);
-		regions[index_region].Kc.assign(pointer_Kc, pointer_Kc + number_controls_actions);
+		 (*regions)[index_region].Kc.assign(pointer_Kc, pointer_Kc + number_controls_actions);
     }
     matClose(pmat_regions);
 }

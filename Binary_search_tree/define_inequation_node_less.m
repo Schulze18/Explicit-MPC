@@ -50,16 +50,17 @@ function [ index_ineq, num_min, flag_ineq_region ] = define_inequation_node_less
                 end
             end
             if flag_new_region == 1 %%%%%%%%%%55
-                number_controls_less_equal(i) = number_controls_less_equal(i) + 1;  %%%%%%%%%%55
+               number_controls_less_equal(i) = number_controls_less_equal(i) + 1;  %%%%%%%%%%55
             end%%%%%%%%%%55
-% % %             if flag_new_region == 1
-% % %                 %set_new_regions = [set_new_regions; nodes{index_node,4}(j,1)];
-% % %                 set_new_regions = [set_new_regions; Regions(nodes{index_node,4}(j,1),:)];
-% % %             end
+            
+% % % %             if flag_new_region == 1 %%1
+% % % %                 %set_new_regions = [set_new_regions; nodes{index_node,4}(j,1)]; %%1
+% % % %                 set_new_regions = [set_new_regions; Regions(nodes{index_node,4}(j,1),:)]; %%1
+% % % %             end %%1
         end
-% % %         set_controls_node = simplified_list_control_laws(set_new_regions,tol);
-% % %         
-% % %         number_controls_less_equal(i) = size(set_controls_node,1); %%%
+% % % %         set_controls_node = simplified_list_control_laws(set_new_regions,tol); %%1
+% % % %         
+% % % %         number_controls_less_equal(i) = size(set_controls_node,1);%%  %%1
     end
     
     %Greater Side
@@ -77,16 +78,16 @@ function [ index_ineq, num_min, flag_ineq_region ] = define_inequation_node_less
                 end
             end
             if flag_new_region == 1 %%%%%%%%%%55
-                number_controls_greater_equal(i) = number_controls_greater_equal(i) + 1; %%%%%%%%%%55
+               number_controls_greater_equal(i) = number_controls_greater_equal(i) + 1; %%%%%%%%%%55
             end %%%%%%%%%%55
-% % % %             if flag_new_region == 1
-% % % %                  %Regions_remaining = [Regions_remaining; Regions(nodes{index_node,4}(i,1),:)];
-% % % %                  set_new_regions = [set_new_regions; Regions(nodes{index_node,4}(j,1),:)];
+% % % %             if flag_new_region == 1  %%1
+% % % %                  %Regions_remaining = [Regions_remaining; Regions(nodes{index_node,4}(i,1),:)]; %%1
+% % % %                  set_new_regions = [set_new_regions; Regions(nodes{index_node,4}(j,1),:)]; %%1
 % % % %             end
         end
-% % % %         set_controls_node = simplified_list_control_laws(set_new_regions,tol);
+% % % %         set_controls_node = simplified_list_control_laws(set_new_regions,tol); %%1
 % % % %         
-% % % %         number_controls_greater_equal(i) = size(set_controls_node,1); %%%
+% % % %         number_controls_greater_equal(i) = size(set_controls_node,1); %% %%1
 
     end
     
