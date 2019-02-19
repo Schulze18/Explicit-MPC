@@ -46,6 +46,7 @@ function [H, F, Sx, Su, Syx, Syu] = regulation_matrices_cost_function(A, B, C, P
 %     Qlinha = Q*eye(Ny);
     Qlinha = Q;
     Clinha = C;
+    %for i = 1:(Ny-1)
     for i = 1:(Ny-1)
         Qlinha = blkdiag(Qlinha,Q);
         Clinha = blkdiag(Clinha,C);
@@ -58,9 +59,11 @@ function [H, F, Sx, Su, Syx, Syu] = regulation_matrices_cost_function(A, B, C, P
 %     F = (Syx'*Qlinha*Syu);
 %     F = [F; -ones(1,Ny+1)*Qlinha*Syu];
 
-      H = (Su'*Clinha'*Qlinha*Clinha*Su + Rlinha);
-      F = (Sx'*Clinha'*Qlinha*Clinha*Su);
-      F = [F; -ones(1,Ny+1)*Qlinha*Clinha*Su];
+      %H = (Su'*Clinha'*Qlinha*Clinha*Su + Rlinha);
+      %F = (Sx'*Clinha'*Qlinha*Clinha*Su);
+      %F = [F; -ones(1,Ny+1)*Qlinha*Clinha*Su];
+      H = Su'*Qlinha*Su + Rlinha;
+      F = Sx'*Qlinha*Su;
       Syu = 0;
       Syx = 0;
 end

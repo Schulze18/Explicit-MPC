@@ -33,22 +33,28 @@ Bc = [1; 0];
 Cc = [0 1];
 
 %Discrete State Space with Ts = 10ms
-A = [0.09982 0;
-     0.0100 1];
-B = [0.01; 0];
-C = [0 1];
+% A = [0.09982 0;
+%      0.0100 1];
+% B = [0.01; 0];
+% C = [0 1];
 
+A =  [0.7326 -0.0861;
+     0.1722 0.9909];
+B = [0.0609;
+    0.0064];
+C = [0 1.4142];
+Ts = 0.1;
 Nstate = size(A,1);
 Ncontrol = size(B,2);
 
-Nsim = 5000;
+Nsim = 100;
 x = zeros(Nstate,Nsim);
 y = zeros(Nsim,1);
 u = y;
 vet_index = y;
 erro = zeros(1,Nsim);
 t = (0:(Nsim-1))*Ts;
-x(:,1) = [0 0]';
+x(:,1) = [0.5 2.5]';
 ref = 1;
 cont_out = 0;
 cont_reg = 0;
@@ -64,8 +70,8 @@ for i = 1:Nsim
         b_CRi = Regions{j,2};
         flag = 0;       
         for k = 1:size(A_CRi,1)
-            %if(A_CRi(k,:)*[x(:,i); ref] > b_CRi(k))
-            if((A_CRi(k,:)*[x(:,i); ref]) > b_CRi(k))
+            if(A_CRi(k,:)*x(:,i) > b_CRi(k))
+            %if((A_CRi(k,:)*[x(:,i); ref]) > b_CRi(k))
 %                 if flag == 0 
 %                     cont_out = cont_out + 1;
 %                 end
@@ -78,8 +84,10 @@ for i = 1:Nsim
         end
     end
     vet_index(i) = index;
-    u_calc = Regions{index,3}*[x(:,i); ref] + Regions{index,4};
-% 
+    %u_calc = Regions{index,3}*[x(:,i); ref] + Regions{index,4};
+
+    u_calc = Regions{index,3}*x(:,i) + Regions{index,4};
+    % 
      %u_calc = test_toolbox_5_5([x(:,i); ref]);
 %    u_calc = expmpc.evaluate([x(:,i); ref]);
 
@@ -91,27 +99,42 @@ for i = 1:Nsim
 
 end
 %%
+% % figure
+% % subplot(3,1,1)
+% % plot(t,y)
+% % hold on
+% % plot(t,ref*ones(1,Nsim),'-r')
+% % legend('Altura','Referencia')
+% % % figure
+% % subplot(3,1,2)
+% % plot(t,u)
+% % legend('control')
+% % subplot(3,1,3)
+% % plot(t,vet_index)
+% % legend('indices')
+% % % figure
+% % % plot(t,cont_reg)
+% % figure
+% % subplot(2,1,1)
+% % plot(t,x(1,1:(end-1)))
+% % legend('zp')
+% % subplot(2,1,2)
+% % plot(t,x(2,1:(end-1)))
+% % legend('z')
+%%
 figure
 subplot(3,1,1)
-plot(t,y)
-hold on
-plot(t,ref*ones(1,Nsim),'-r')
-legend('Altura','Referencia')
-% figure
+plot(t,x(1,1:Nsim))
+legend('x1')
 subplot(3,1,2)
-plot(t,u)
-legend('control')
+plot(t,x(2,1:Nsim))
+legend('x2')
 subplot(3,1,3)
-plot(t,vet_index)
-legend('indices')
-% figure
-% plot(t,cont_reg)
-figure
-subplot(2,1,1)
-plot(t,x(1,1:(end-1)))
-legend('zp')
-subplot(2,1,2)
-plot(t,x(2,1:(end-1)))
-legend('z')
+plot(t,u(1:Nsim))
+legend('Input')
 
-
+%%
+figure(1)
+plot(x(1,1),x(2,1),'*k')
+plot(x(1,1:Nsim),x(2,1:Nsim),'k')
+plot(x(1,Nsim),x(2,Nsim),'*k')

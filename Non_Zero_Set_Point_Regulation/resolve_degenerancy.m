@@ -48,12 +48,30 @@ function  [ G_tio, W_tio, S_tio, index, flag, flag_x_nan] = resolve_degenerancy(
                 G_test = [G_test ; G(Lcand(i),:)];
             end
             
-            %Find index from 
-            for i = 1:length(Lcand)
-                if Lcand(i) == last_cand
-                    index_last_cand = i;
+% % %             %Find index from 
+% % %             for i = 1:length(Lcand)
+% % %                 if Lcand(i) == last_cand %%Old
+% % %                     index_last_cand = i;
+% % %                 end
+% % %             end
+                      
+            index_last_cand = 0;
+            it_cand = 0;
+            while index_last_cand == 0
+                for i = 1:length(Lcand)
+                    if Lcand(i) == last_cand(end - it_cand)
+                        index_last_cand = i;
+                    end
+                end
+                it_cand = it_cand + 1;
+                if it_cand == 2
+                    disp('mais um index');
                 end
             end
+                
+            %Debug
+%             length(Lcand)
+%             last_cand
             
             %Equacao 18, 19 e 20
             lambda = sdpvar(length(Lcand),1,'full');

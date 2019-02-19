@@ -23,7 +23,7 @@ function [G, W, E, S, num_Gu, G_x2, W_x2, E_x2] = regulation_constraints_reformu
     
     num_state = size(A,2);         %Number of elements in the state vector
     num_control = size(B,2);       %Number of control inputs 
-    num_ref = 1;%length(Refmax);
+    num_ref = 0;%length(Refmax);
     
     %U constraints
     if isempty(Umax) == 0

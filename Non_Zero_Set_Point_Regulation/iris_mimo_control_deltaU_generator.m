@@ -58,24 +58,40 @@ Nref = Nout;
 % % % %Q = diag([0.7/10^2, 0.1/0.5^2, 0.1/0.5^2 0.1/0.5^2]);
 % % % Ru = 0.01*diag([0.7/(2*m*g)^2, 0.1, 0.1, 0.1]);
 % % % Rdu = 0.01*diag([0.7/(8*m)^2, 0.1/0.1^2, 0.1/0.1^2, 0.1/0.1^2]);
-Q = diag([3,0.05,0.05,0.03]);
-Ru = 0.2*diag([0.0005,0.02,0.02,0.04]);
-Rdu = 0.5*diag([0.005,0.05,0.05,0.05]);
+% Q = diag([3,0.05,0.05,0.03]);
+% Ru = 0.2*diag([0.0005,0.02,0.02,0.04]);
+% Rdu = 0.5*diag([0.005,0.05,0.05,0.05]);
 % % % % % % % % % % % % Q = diag([10, 0.01, 0.01, 0.01]);
 % % % % % % % % % % % % Ru = 0.2*diag([1,100,100,100]);
 % % % % % % % % % % % % Rdu = 0.5*diag([1,100,100,100]);
 
+%Linux
+Q = diag([3,0.11,0.098,0.05]);
+Ru = 0.5*diag([0.001,0.021,0.019,0.048]);
+Rdu = 0.5*diag([0.0052,0.048,0.053,0.055]);
+
+
 Ny = 10;
 Nu = 3;
 
-deltaU_max = [8*m Inf Inf Inf]';
-deltaU_min = [-4*m -Inf -Inf -Inf]';
-
 angle_speed_max = pi/4;
-% % U_max = [2*m*g Inf Inf Inf]';
-% % U_min = [-m*g -Inf -Inf -Inf];
-U_max = [2*m*g angle_speed_max*Ixx angle_speed_max*Iyy angle_speed_max*Izz]';
-U_min = [-m*g -angle_speed_max*Ixx -angle_speed_max*Iyy -angle_speed_max*Izz]';
+angle_acel_max = angle_speed_max/5;
+
+% deltaU_max = [8*m Inf Inf Inf]';
+% deltaU_min = [-4*m -Inf -Inf -Inf]';
+% deltaU_max = [8*m 1.2*angle_acel_max*Ixx 0.7*angle_acel_max*Iyy 1.5*angle_acel_max*Izz]';
+% deltaU_min = [-4*m -0.9*angle_acel_max*Ixx -1.3*angle_acel_max*Iyy -2*angle_acel_max*Izz]';
+deltaU_max = [8*m 0.1 0.1 0.1]';
+deltaU_min = [-4*m -0.1 -0.1 -0.1]';
+
+
+%deltaU_max = [8*m 1.2*angle_acel_max*Ixx Inf Inf]';
+%deltaU_min = [-4*m -0.9*angle_acel_max*Ixx -Inf -Inf]';
+
+U_max = [2*m*g Inf Inf Inf]';
+U_min = [-m*g -Inf -Inf -Inf];
+%U_max = [2*m*g 1.2*angle_speed_max*Ixx 0.7*angle_speed_max*Iyy 1.5*angle_speed_max*Izz]';
+%U_min = [-m*g -0.9*angle_speed_max*Ixx -1.3*angle_speed_max*Iyy -2*angle_speed_max*Izz]';
  
 Ref_max = [];%[30 Inf Inf Inf]';
 Ref_min = [];%[-1 -Inf -Inf -Inf]';
@@ -97,7 +113,7 @@ last_plot = 0;
 [G, W, E, S, num_Gu] = setpoint_deltaU_generic_constraints(Sx, Su, Sdu, Clinha, H, F, Nstate, Ncontrol, Nout, Nref, Ny, Nu, deltaU_max, deltaU_min, U_max, U_min, Ref_max, Ref_min, X_max, X_min, Y_max, Y_min);
 
  %% Loop variables Initialization
-Lopt{1,1} = [];Lcand{1,2} = []; Lcand{1,3} = [];
+Lopt{1,1} = [];Lcand{1,2} = []; Lcand{1,3} = [];Lcand{1,4} = [];
 %Lcand{1,1} = [6]; Lcand{1,2} = []; Lcand{1,3} = [];
 %Lcand{1,1} = [1,2,3,4]'; Lcand{1,2} = []; Lcand{1,3} = [];
 %Lopt{1,1} = [1,2,3,4,5];
@@ -213,7 +229,9 @@ while isempty(Lcand) == 0
             if (type(i) == 1 ) && (origem(i) ~= 0 && origem(i) <= num_Gu) && (isempty(Lcand{end,1}) || (flag_repeticao == 0))   
                 %%%%%%%%%%%%%%%possible_new_set = [Lcand{end,1}; origem(i)];
                 possible_new_set = [index; origem(i)];
-                new_index = origem(i);
+                %new_index = origem(i); %Old
+                new_index = [Lcand{end,4}; origem(i)];%Only for test - saving the latest index add
+                
             %elseif type(i) == 2 && origem(i) ~= 0
             %elseif (type(i) == 2) && (origem(i) ~= 0) && (origem(i) > num_Gu)
             %elseif (type(i) == 2) && (isempty(Lcand{end,1}) || (flag_repeticao == 0))
@@ -225,7 +243,10 @@ while isempty(Lcand) == 0
                  possible_new_set = index;
                  
                  %possible_new_set = possible_new_set(1:end-1,1);
-                  possible_new_set(origem(i)) = [];
+                 possible_new_set(origem(i)) = [];
+                  
+                 %Only for test - saving the latest index add
+                 new_index = Lcand{end,4};
             else
                 if (Lcand{end,1} == origem(i))
                     comb_ruim{end+1} = [Lcand{end,1}; origem(i)];
