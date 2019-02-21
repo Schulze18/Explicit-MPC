@@ -5,18 +5,6 @@
 #include <vector>
 #include <fstream>
 
-//int number_fields_bst;
-//int number_fields_regions;
-//int max_number_ineq;
-/*int total_nodes;
-int total_regions;
-int number_states;
-int number_controls_actions;
-int number_fields_bst;
-int number_fields_regions;
-int max_number_ineq;
-*/
-
 void write_double_to_file(double *element, std::ofstream *file) {
 	(*file).write((char*)&(*element), sizeof(*element));
 }
@@ -24,31 +12,59 @@ void write_double_to_file(double *element, std::ofstream *file) {
 void write_int_to_file(int *element, std::ofstream *file) {
 	(*file).write((char*)&(*element), sizeof(*element));
 }
-/*
-void export_bst_to_file(std::vector<struct_bst> *bst_nodes , const char *filename){
+
+void export_regions_to_file(struct_control_param *control_param, std::vector<struct_regions> *regions, const char *filename) {
+
+	std::ofstream file_regions(filename, std::ios::out | std::ios::binary);
+
+	//Export total number of regions
+	write_int_to_file(&((*control_param).total_regions), &file_regions);
+
+	//Export number of states
+	write_int_to_file(&((*control_param).number_states), &file_regions);
+
+	//Export number of controls actions u
+	write_int_to_file(&((*control_param).number_controls_actions), &file_regions);
+
+	for (int index_region = 0; index_region < (*control_param).total_regions; index_region++) {
+		//Export Kx
+		for (int it_kx = 0; it_kx < (*control_param).number_controls_actions * (*control_param).number_states; it_kx++) {
+			double element_kx = (*regions)[index_region].Kx[it_kx];
+			write_double_to_file(&element_kx, &file_regions);
+		}
+
+		//Export Kc
+		for (int it_kc = 0; it_kc < (*control_param).number_controls_actions; it_kc++) {
+			double element_kc = (*regions)[index_region].Kc[it_kc];
+			write_double_to_file(&element_kc, &file_regions);
+		}
+	}
+	file_regions.close();
+}
+
+void export_bst_to_file(struct_control_param *control_param, std::vector<struct_bst> *bst_nodes , const char *filename){
 
     std::ofstream file_bst(filename, std::ios::out | std::ios::binary);
 
-    write_int_to_file(&total_nodes,&file_bst);
-    write_int_to_file(&number_states,&file_bst);
+	//Export total number of regions
+	write_int_to_file(&((*control_param).total_nodes), &file_bst);
 
-	for (int index_node = 0; index_node < total_nodes; index_node++){
+	//Export number of states
+	write_int_to_file(&((*control_param).number_states), &file_bst);
 
-        //Export A
-        for (int it_A = 0; it_A < number_states; it_A++){
-            double element_A;
-			element_A = (*bst_nodes)[index_node].A[it_A];
-			write_double_to_file(&element_A,&file_bst);
-        }
+	for (int index_node = 0; index_node < (*control_param).total_nodes; index_node++){
 
-        //Export b
-        write_double_to_file(&((*bst_nodes)[index_node].b),&file_bst);
+        //Export Inequation Index
+		write_int_to_file(&((*bst_nodes)[index_node].ineq_index), &file_bst);
 
         //Export left
         write_int_to_file(&((*bst_nodes)[index_node].left),&file_bst);
 
         //Export right
         write_int_to_file(&((*bst_nodes)[index_node].right),&file_bst);
+
+		//Export parent node
+		write_int_to_file(&((*bst_nodes)[index_node].parent_node), &file_bst);
 
         //Export Number of regions
         int number_regions_node = (*bst_nodes)[index_node].regions.size();
@@ -61,53 +77,59 @@ void export_bst_to_file(std::vector<struct_bst> *bst_nodes , const char *filenam
         }
 	}
     file_bst.close();
-
 }
 
-void export_regions_to_file(std::vector<struct_regions> *regions, const char *filename){
+void export_ineq_set_to_file(struct_control_param *control_param, std::vector<struct_ineq_set> *ineq_set, const char *filename) {
 
-    std::ofstream file_regions(filename, std::ios::out | std::ios::binary);
+	std::ofstream file_ineq_set(filename, std::ios::out | std::ios::binary);
 
-    //Export total number of regions
-    write_int_to_file(&total_regions,&file_regions);
+	//Export total number of inequations
+	write_int_to_file(&((*control_param).total_ineq), &file_ineq_set);
 
-    //Export number of controls actions u
-    write_int_to_file(&number_controls_actions, &file_regions);
+	//Export number of states
+	write_int_to_file(&((*control_param).number_states), &file_ineq_set);
 
-    for (int index_region = 0; index_region < total_regions; index_region++) {
-
-        //Export number of inequation that define the region
-        int number_inequation_region = (*regions)[index_region].set_A.size();
-        write_int_to_file(&number_inequation_region,&file_regions);
-
-        //Export inequations set A
-        for (int it_ineq = 0; it_ineq < number_inequation_region; it_ineq++) {
-			for (int it_element = 0; it_element < number_states; it_element++) {
-                double element_ineq_A = (*regions)[index_region].set_A[it_ineq][it_element];
-                write_double_to_file(&element_ineq_A,&file_regions);
-            }
-        }
-
-        //Export b
-        for (int it_ineq = 0; it_ineq < number_inequation_region; it_ineq++) {
-            double element_b = (*regions)[index_region].set_b[it_ineq];
-            write_double_to_file(&element_b,&file_regions);
-        }
-
-        //Export Kx
-		for (int it_kx = 0; it_kx < number_controls_actions*number_states; it_kx++) {
-            double element_kx = (*regions)[index_region].Kx[it_kx];
-            write_double_to_file(&element_kx,&file_regions);
+	for (int index_ineq = 0;  index_ineq < (*control_param).total_ineq;  index_ineq++) {
+		//Export A
+		for (int it_A = 0; it_A <(*control_param).number_states; it_A++) {
+			double element_A;
+			element_A = (*ineq_set)[index_ineq].A[it_A];
+			write_double_to_file(&element_A, &file_ineq_set);
 		}
+		//Export b
+		write_double_to_file(&((*ineq_set)[index_ineq].b), &file_ineq_set);
+	}
+	file_ineq_set.close();
+}
 
-        //Export Kc
-		for (int it_kc = 0; it_kc < number_controls_actions; it_kc++) {
-			double element_kc = (*regions)[index_region].Kc[it_kc];
-            write_double_to_file(&element_kc,&file_regions);
-		}
-    }
-    file_regions.close();
-}*/
+void export_control_param_to_file(struct_control_param *control_param, const char *filename) {
+
+	std::ofstream file_control_param(filename, std::ios::out | std::ios::binary);
+
+	//Export number of states
+	write_int_to_file(&((*control_param).number_states), &file_control_param);
+
+	//Export number of control actions
+	write_int_to_file(&((*control_param).number_controls_actions), &file_control_param);
+
+	//Export total number of regions
+	write_int_to_file(&((*control_param).total_regions), &file_control_param);
+
+	//Export total number of nodes
+	write_int_to_file(&((*control_param).total_nodes), &file_control_param);
+
+	//Export total number of inequations
+	write_int_to_file(&((*control_param).total_ineq), &file_control_param);
+
+	//Export number of fields from bst
+	write_int_to_file(&((*control_param).number_fields_bst), &file_control_param);
+
+	//Export number of fields from regions
+	write_int_to_file(&((*control_param).number_fields_regions), &file_control_param);
+
+	//Export number of fields from ineq
+	write_int_to_file(&((*control_param).number_fields_ineq), &file_control_param);
+}
 
 void get_struct_bst_from_mat(struct_control_param *control_param, std::vector<struct_bst> *bst_nodes, const char *filename){
     
@@ -195,4 +217,33 @@ void get_struct_regions_from_mat(struct_control_param *control_param, std::vecto
     }
 	
     matClose(pmat_regions);
+}
+
+void get_struct_ineq_from_mat(struct_control_param *control_param, std::vector<struct_ineq_set> *ineq_set, const char *filename) {
+
+	MATFile *pmat_ineq;
+
+	pmat_ineq = matOpen(filename, "r");
+	//Get struct from the .mat, it is maybe necessary to change the struct name
+	mxArray *mat_data_ineq = matGetVariable(pmat_ineq, "ineq_pos");
+
+	(*control_param).total_ineq = mxGetM(mat_data_ineq);//mxGetNumberOfElements(mat_struct_regions);
+	(*control_param).number_fields_ineq = mxGetN(mat_data_ineq);
+
+	mxArray **element_ineq;
+	element_ineq = (mxArray **)mxGetData(mat_data_ineq);
+
+	for (int index_ineq = 0; index_ineq < (*control_param).total_ineq; index_ineq++) {
+		(*ineq_set).push_back(struct_ineq_set());
+
+		//Reading A inequation from .mat
+		double *A_ineq = mxGetPr(element_ineq[index_ineq]);
+		(*ineq_set)[index_ineq].A.assign(A_ineq, A_ineq + (*control_param).number_states);
+		
+		//Reading b inequation from .mat
+		(*ineq_set)[index_ineq].b = *(mxGetPr(element_ineq[1 * (*control_param).total_ineq + index_ineq]));
+	}
+
+
+	matClose(pmat_ineq);
 }
