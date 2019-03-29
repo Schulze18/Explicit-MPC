@@ -1,4 +1,4 @@
-function [z0, diagnostics] = optimal_z_mp_QP(G, W, S, H, F, x0, Nstate, Ncontrol, Nout, Ny, Nu)
+function [z0, diagnostics] = optimal_z_mp_QP(G, W, S, H, F, x0, Nstate, Ncontrol, Nout, Ny, Nu, options)
 %[z0, diagnostics] = optimal_z_mp_QP(G, W, S, H, F, x0, Nu)
 %
 %Calculate the optmizal z to the mp-QP problem: 
@@ -27,13 +27,13 @@ function [z0, diagnostics] = optimal_z_mp_QP(G, W, S, H, F, x0, Nstate, Ncontrol
     %LMI = [LMI, -G*z + W + S*x0 >= 0 ];
      LMI = [LMI, G*z <= W + S*x0 ];
     objetivo = 0.5*z'*H*z;
-    options = sdpsettings;
+% %     options = sdpsettings;
 % %     options.solver = 'sedumi';
 %     options.verbose = 0;
     
-    options.solver='sdpt3';
-    options.verbose = 0;
-    options.cachesolvers = 1;
+% %     options.solver='sdpt3';
+% %     options.verbose = 0;
+% %     options.cachesolvers = 1;
     
     options.sdpt3.maxit = 100;
     options.sdpt3.steptol = 1.0000e-05;

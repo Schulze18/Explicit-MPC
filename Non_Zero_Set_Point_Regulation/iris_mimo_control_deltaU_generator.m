@@ -1,7 +1,7 @@
 %Explicit MPC for Iris 3DR Quadcopter for z,theta,phi and psi control
 clear all
 % close all
-clc
+% clc
 
 %Iris 3DR Parameters
 g = 9.81;
@@ -50,7 +50,7 @@ Nstate = size(A,1);
 Ncontrol = size(B,2);
 Nout = size(C,1);
 Nref = Nout;
- 
+ %%
 %Explicit MPC Parameters
 % % % Q = diag([5,1,1,1]);
 % % % %  Ru = diag([0.00001,0.00001,0.00001,0.00001]);
@@ -65,34 +65,53 @@ Nref = Nout;
 % % % % % % % % % % % % Ru = 0.2*diag([1,100,100,100]);
 % % % % % % % % % % % % Rdu = 0.5*diag([1,100,100,100]);
 
-%Linux
-Q = diag([3,0.11,0.098,0.05]);
-Ru = 0.5*diag([0.001,0.021,0.019,0.048]);
-Rdu = 0.5*diag([0.0052,0.048,0.053,0.055]);
+%Weigh Matrices
+% Q = diag([3,0.11,0.098,0.05]);
+% Ru = 0.5*diag([0.001,0.021,0.019,0.048]);
+% Rdu = 0.5*diag([0.0052,0.048,0.053,0.055]);
+Q = diag([3,0.10,0.10,0.05]);
+Ru = 0.5*diag([0.001,0.02,0.02,0.05]);
+Rdu = 0.5*diag([0.005,0.05,0.05,0.05]);
 
-
+%Horizons
 Ny = 10;
-Nu = 3;
+Nu = 2;
+ 
+% angle_speed_max = pi/4;
+% angle_acel_max = angle_speed_max/5;
 
-angle_speed_max = pi/4;
-angle_acel_max = angle_speed_max/5;
+%Constraints calculation
+delta_w = 50;
+tau_phi_max = 4*KT*ly*wo*delta_w;
+tau_theta_max = 4*KT*lx*wo*delta_w;
+tau_psi_max = 4*KD*wo*delta_w;
+delta_it = 4;
 
-% deltaU_max = [8*m Inf Inf Inf]';
-% deltaU_min = [-4*m -Inf -Inf -Inf]';
+deltaU_max = [];%[8*m Inf Inf Inf]';
+deltaU_min = [];%[-4*m -Inf -Inf -Inf]';
+% deltaU_max = [8*m tau_phi_max/delta_it tau_theta_max/delta_it tau_psi_max/delta_it]';
+% deltaU_min = [-4*m -tau_phi_max/delta_it -tau_theta_max/delta_it -tau_psi_max/delta_it]';
 % deltaU_max = [8*m 1.2*angle_acel_max*Ixx 0.7*angle_acel_max*Iyy 1.5*angle_acel_max*Izz]';
 % deltaU_min = [-4*m -0.9*angle_acel_max*Ixx -1.3*angle_acel_max*Iyy -2*angle_acel_max*Izz]';
-deltaU_max = [8*m 0.1 0.1 0.1]';
-deltaU_min = [-4*m -0.1 -0.1 -0.1]';
+% deltaU_max = [];%[8*m 0.1 0.1 0.1]';
+% deltaU_min = [];%[-4*m -0.1 -0.1 -0.1]';
 
 
 %deltaU_max = [8*m 1.2*angle_acel_max*Ixx Inf Inf]';
 %deltaU_min = [-4*m -0.9*angle_acel_max*Ixx -Inf -Inf]';
 
-U_max = [2*m*g Inf Inf Inf]';
-U_min = [-m*g -Inf -Inf -Inf];
-%U_max = [2*m*g 1.2*angle_speed_max*Ixx 0.7*angle_speed_max*Iyy 1.5*angle_speed_max*Izz]';
-%U_min = [-m*g -0.9*angle_speed_max*Ixx -1.3*angle_speed_max*Iyy -2*angle_speed_max*Izz]';
- 
+% U_max = [2*m*g Inf Inf Inf]';
+% U_min = [-m*g -Inf -Inf -Inf]';
+% U_max = [2*m*g tau_phi_max tau_theta_max tau_psi_max]';
+% U_min = [-m*g -tau_phi_max -tau_theta_max -tau_psi_max]';
+U_max = [2*m*g tau_phi_max tau_theta_max Inf]';
+U_min = [-m*g -tau_phi_max -tau_theta_max -Inf]';
+% U_max = [2*m*g 1.2*angle_speed_max*Ixx 0.7*angle_speed_max*Iyy 1.5*angle_speed_max*Izz]';
+% U_min = [-m*g -0.9*angle_speed_max*Ixx -1.3*angle_speed_max*Iyy -2*angle_speed_max*Izz]';
+% U_max = [2*m*g 0.2 0.15 0.1]';
+% U_min = [-m*g -0.2 -0.15 -0.1]';
+
+
 Ref_max = [];%[30 Inf Inf Inf]';
 Ref_min = [];%[-1 -Inf -Inf -Inf]';
  
@@ -106,6 +125,15 @@ Y_min = [];%[-1.5 -Inf -Inf -Inf]';
 tol = 1e-7;
 n_plot = 20;
 last_plot = 0;
+
+%Solver Options
+sdp_opt = sdpsettings;
+sdp_opt.solver = 'sdpt3';
+sdp_opt.verbose = 0;
+sdp_opt.cachesolvers = 1;
+sdp_opt.sdpt3.maxit = 30;
+sdp_opt.sdpt3.steptol = 1.0000e-5;
+sdp_opt.sdpt3.gaptol = 5.000e-5;
  
 %%
 [H, F, Sx, Su, Sdu, T_du, Qlinha, Rulinha, Rdulinha, Clinha] = setpoint_deltaU_matrices_cost_function(A, B, C, Q, Ru, Rdu, Nstate, Ncontrol, Nout, Ny, Nu);
@@ -144,7 +172,7 @@ while isempty(Lcand) == 0
         end
 
         if (rank(G_tio) < size(G_tio,1)) && (rank(G_tio) < size(G_tio,2)  &&  flag_verified == 0)%status_infesiable == 0)% && (size(Lcand{end,1},1) > 1)
-            [G_tio, W_tio, S_tio, index, status_infesiable, flag_x_nan] = resolve_degenerancy(G, W, S, H, F, Lcand{end,2}, Lcand{end,3}, Nstate + Nref + Ncontrol, Ncontrol, Nout, Ny, Nu, Lcand{end,1}, tol, Lcand{end,4});
+            [G_tio, W_tio, S_tio, index, status_infesiable, flag_x_nan] = resolve_degenerancy(G, W, S, H, F, Lcand{end,2}, Lcand{end,3}, Nstate + Nref + Ncontrol, Ncontrol, Nout, Ny, Nu, Lcand{end,1}, tol, Lcand{end,4}, sdp_opt);
             %disp('Degen');
             index = sort(index);
             
@@ -172,7 +200,13 @@ while isempty(Lcand) == 0
             [A, b, type, origem] = define_region(G, W, S, G_tio, W_tio, S_tio, H, tol);
              if ((isempty(A) == 0) && (sum((sum(isnan(A)))) == 0) && (sum((sum(isinf(A)))) == 0)) %Soma de todos os elementos de isnan(A)
               
-                [A, b, type, origem] = remove_redundant_constraints(A, b, type, origem, Nu, Nstate +  Nref + Ncontrol);
+                A_old_test = A;
+                b_old_test = b;
+               [A, b, type, origem] =  remove_redundant_constraints(A, b, type, origem, Nu, Nstate +  Nref + Ncontrol, sdp_opt);
+               if ((size(A_old_test,1) - size(A,1)) > 0)
+                    A_old_test;
+                    A;
+               end
 %                 Lcand{end,2} = A;
 %                 Lcand{end,3} = b;
                 [Kx, Ku] = define_control(G, W, S, G_tio, W_tio, S_tio, H, F, Ncontrol);
@@ -191,7 +225,7 @@ while isempty(Lcand) == 0
         origem = (1:size(G,1))';
         type = ones(size(G,1),1);
         %type(5:end) = 2;
-        [A, b, type, origem] = remove_redundant_constraints(A, b, type, origem, Nu, Nstate +  Nref + Ncontrol);
+        [A, b, type, origem] = remove_redundant_constraints(A, b, type, origem, Nu, Nstate +  Nref + Ncontrol, sdp_opt);
         Kx = (-inv(H)*F');
         Kx = Kx(1:Ncontrol,:);
         Ku = zeros(Ncontrol,1);

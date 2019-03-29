@@ -3,7 +3,7 @@ clc
 tol = 1e-6;
 
 %load('regions_10_4_u_du.mat');
-load('/File_results/regions_10_3_u_du_v3.mat');
+load('/File_results/regions_10_2_u_all_v2.mat');
 %Step 1 - Algorithm 2 - Computation all the I(j+) and I(j-)
 %%
 ineq_pos = verifiy_total_ineq(Regions);
@@ -16,13 +16,25 @@ ineq_neg = cellfun(@(x) x*(-1),ineq_pos,'un',0);
 ineq_test = which_region_ineq(ineq_pos,Regions,tol);
 
 %%
+%Solver configurations
+solver_opt = sdpsettings;
+solver_opt.solver='sedumi';
+solver_opt.verbose = 0;
+solver_opt.cachesolvers = 1;
+solver_opt.sdpt3.maxit = 20;
+solver_opt.sdpt3.steptol = 1.0000e-07;
+solver_opt.sdpt3.gaptol = 5.000e-7;
+solver_opt.sedumi.eps = 5.0000e-04;
+solver_opt.sedumi.maxiter = 20;
+
 tic
 for i = 1:size(ineq_pos,1)
     i
     for j = 1:size(Regions,1)
-        result = side_ineq_region(ineq_pos(i,:),Regions(j,:));
+        result = side_ineq_region(ineq_pos(i,:),Regions(j,:), solver_opt);
         ineq_pos{i,6}(j,1) = result;
     end
+    toc
 end
 toc
 

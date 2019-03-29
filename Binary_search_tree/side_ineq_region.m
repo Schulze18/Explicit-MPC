@@ -1,4 +1,4 @@
-function [result, diagnostics1, diagnostics2] = side_ineq_region(ineq, Region)
+function [result, diagnostics1, diagnostics2] = side_ineq_region(ineq, Region, options)
 %UNTITLED4 Summary of this function goes here
 %   Detailed explanation goes here
     %result = 0; 
@@ -38,19 +38,19 @@ function [result, diagnostics1, diagnostics2] = side_ineq_region(ineq, Region)
         x = sdpvar(size(A_ineq,2),1,'full');
 
         objective = A_ineq*x - b_ineq;
-        options = sdpsettings;
-
-        options.solver='sedumi';
-%          options.solver='sdpt3';
-        options.verbose = 0;
-        options.cachesolvers = 1;
-
-%         options.sdpt3.maxit = 20;
-%         options.sdpt3.steptol = 1.0000e-08;
-%         options.sdpt3.gaptol = 5.000e-8;
-        
-        options.sedumi.eps = 5.0000e-04;
-        options.sedumi.maxiter = 20;
+% % % % %         options = sdpsettings;
+% % % % % 
+% % % % %         options.solver='sedumi';
+% % % % % %          options.solver='sdpt3';
+% % % % %         options.verbose = 0;
+% % % % %         options.cachesolvers = 1;
+% % % % % 
+% % % % % %         options.sdpt3.maxit = 20;
+% % % % % %         options.sdpt3.steptol = 1.0000e-08;
+% % % % % %         options.sdpt3.gaptol = 5.000e-8;
+% % % % %         
+% % % % %         options.sedumi.eps = 5.0000e-04;
+% % % % %         options.sedumi.maxiter = 20;
 
 
         A_region = Region{1,1};

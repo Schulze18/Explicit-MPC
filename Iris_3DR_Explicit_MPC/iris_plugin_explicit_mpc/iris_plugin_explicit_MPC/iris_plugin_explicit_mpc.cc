@@ -2,7 +2,7 @@
 
 #ifndef _IRIS_PLUGIN_EXPLICIT_MPC_HH_
 #define _IRIS_PLUGIN_EXPLICIT_MPC_HH_
-iris_plugin_explicit_mpc
+
 // Include default libraries for Gazebo and ROS interface
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>

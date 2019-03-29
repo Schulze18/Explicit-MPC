@@ -1,4 +1,4 @@
-function [xc , r, diagnostics] = chebychev_ball(A, b, G, W, S, H, F, Nstate, Ncontrol, Nout, Ny, Nu)
+function [xc , r, diagnostics] = chebychev_ball(A, b, G, W, S, H, F, Nstate, Ncontrol, Nout, Ny, Nu, options)
 %[xc , r, diagnostics] = chebychev_ball(A, b, G, W, S, H, F, Nu, Nstate)
 %
 %Return the center of the largest possible ball that can be placed inside
@@ -31,11 +31,11 @@ function [xc , r, diagnostics] = chebychev_ball(A, b, G, W, S, H, F, Nstate, Nco
     end
     LMI = [LMI; G*z - S*xc <= W];
 
-    options=sdpsettings;
+% %     options=sdpsettings;
 %     options.solver='sedumi';
-    options.solver='sdpt3';
-    options.verbose = 0;
-    options.cachesolvers = 1;
+% %     options.solver='sdpt3';
+% %     options.verbose = 0;
+% %     options.cachesolvers = 1;
     
     options.sdpt3.maxit = 20;
     options.sdpt3.steptol = 1.0000e-08;

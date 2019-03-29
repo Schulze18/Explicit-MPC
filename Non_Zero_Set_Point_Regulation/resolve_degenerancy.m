@@ -1,4 +1,4 @@
-function  [ G_tio, W_tio, S_tio, index, flag, flag_x_nan] = resolve_degenerancy(G, W, S, H, F, A, b, Nstate, Ncontrol, Nout, Ny, Nu, Lcand, tol, last_cand)
+function  [ G_tio, W_tio, S_tio, index, flag, flag_x_nan] = resolve_degenerancy(G, W, S, H, F, A, b, Nstate, Ncontrol, Nout, Ny, Nu, Lcand, tol, last_cand, options)
 %UNTITLED2 Summary of this function goes here 
 %   Detailed explanation goes here
     %%%Reconstroi Região que originou a que esta sendo avaliada
@@ -26,7 +26,7 @@ function  [ G_tio, W_tio, S_tio, index, flag, flag_x_nan] = resolve_degenerancy(
     W_tio = [];
     S_tio = [];
 
-    [xc , r, diagnostics] = chebychev_ball(A, b, G, W, S, H, F, Nstate, Ncontrol, Nout, Ny, Nu);
+    [xc , r, diagnostics] = chebychev_ball(A, b, G, W, S, H, F, Nstate, Ncontrol, Nout, Ny, Nu, options);
     
     flag_x_nan = 0;
     for i = 1:size(xc,1)
@@ -39,7 +39,7 @@ function  [ G_tio, W_tio, S_tio, index, flag, flag_x_nan] = resolve_degenerancy(
     if  (diagnostics.problem > 0)% || (sum(isnan(xc)) > 0) 
         flag = 1;
     else
-        [z0, diagnostics] = optimal_z_mp_QP(G, W, S, H, F, xc, Nstate, Ncontrol, Nout, Ny, Nu);
+        [z0, diagnostics] = optimal_z_mp_QP(G, W, S, H, F, xc, Nstate, Ncontrol, Nout, Ny, Nu, options);
         if diagnostics.problem > 0
             flag = 1;
         else
@@ -82,7 +82,7 @@ function  [ G_tio, W_tio, S_tio, index, flag, flag_x_nan] = resolve_degenerancy(
             LMI = [LMI; H*z0 + G_test'*lambda == 0];
             LMI = [LMI; lambda >= 0];
             
-            options=sdpsettings;
+            %options=sdpsettings;
 %             options.solver='sedumi';
 %             options.verbose = 0;
             

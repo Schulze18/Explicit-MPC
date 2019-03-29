@@ -1,4 +1,4 @@
-function [A_new, b_new, type_new, origem_new] = remove_redundant_constraints(A, b, type_new, origem_new, Nu, Nstate)
+function [A_new, b_new, type_new, origem_new] = remove_redundant_constraints(A, b, type_new, origem_new, Nu, Nstate, options)
 %[A_new, b_new] = remove_redundant_constraints(A, b, Nu, Nstate)
 %
 %Remove the redundant constraints of a polyehdral defined by Ax<=b.
@@ -12,8 +12,13 @@ function [A_new, b_new, type_new, origem_new] = remove_redundant_constraints(A, 
 %constrained systems" by A. Bemporad, M. Morari, V. Dua, and E. Pistikopoulos. 
     index = [];
       
+%     options = sdpsettings;
+%     options.solver = 'sdpt3';
+%     options.verbose = 0;
+%     options.cachesolvers = 1;
+    x = sdpvar(Nstate,1,'full');
     for i=1:size(A,1)
-        x = sdpvar(Nstate,1,'full');
+        %x = sdpvar(Nstate,1,'full');
         LMI = [];
         for j=1:size(A,1)
             if j ~= i
@@ -23,12 +28,12 @@ function [A_new, b_new, type_new, origem_new] = remove_redundant_constraints(A, 
         LMI = [LMI, A(i,:)*x <= (b(i)+1)];
         objetivo = A(i,:)*x;
         
-        options = sdpsettings;
-        options.solver = 'sdpt3';
-% %         options.solver = 'linprog';
-% % %         options.solver = 'sedumi';
-        options.verbose = 0;
-        options.cachesolvers = 1;
+% % %         options = sdpsettings;
+% % %         options.solver = 'sdpt3';
+% % % % %         options.solver = 'linprog';
+% % % % % %         options.solver = 'sedumi';
+% % %         options.verbose = 0;
+% % %         options.cachesolvers = 1;
 % % % % %%Sedumi
 % % % % %         options.sedumi.cg.stagtol = 5.000e-4;
 % % % % %         options.sedumi.eps = 1.0000e-04;

@@ -76,7 +76,6 @@ function [H, F, Sx, Su, Sdu, T_du, Qlinha, Rulinha, Rdulinha, Clinha] = setpoint
         Rdulinha = blkdiag(Rdulinha,Rdu);
         I_u = [I_u; eye(Ncontrol)];
     end
-    
     T_du = [];
     for i = 1:Nu
         T_du_temp = [];
