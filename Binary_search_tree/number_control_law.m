@@ -1,6 +1,17 @@
 function [control_law, vector_number] = number_control_law(ineq, Regions)
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+%[control_law, vector_number] = number_control_law(ineq, Regions)
+%Get the remaining of control laws in a set of Regions
+%Inputs:
+%       Regions - cell array with a set of the regions from the explicit
+%       controller
+%
+%       ineq - set of inequations  
+%
+%Outputs:
+%       control_law - cell array with the remaining control laws
+%
+%       vector_number - array with the number of control laws for each
+%       inequation
     
     control_law = cell(size(ineq,1),1);
     vector_number = zeros(size(ineq,1),1);

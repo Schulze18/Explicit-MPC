@@ -1,6 +1,14 @@
 function [ reg_struct ] = regions_cell_to_struct(Regions)
-%UNTITLED2 Summary of this function goes here
-%   Detailed explanation goes here
+%[ reg_struct ] = regions_cell_to_struct(Regions)
+%
+%Convert cell array with Regions to struct data type
+%Inputs:
+%       Regions - a cell array with the partitioned regions, each row is
+%       composed by four columns: Ai bi Kx Kc
+%
+%Outputs:
+%       reg_struct - struct array with four fields: : A b Kx Kc
+%
 max_size = 1;
 for i = 1:size(Regions,1)
     if size(Regions{i,1},1) > max_size

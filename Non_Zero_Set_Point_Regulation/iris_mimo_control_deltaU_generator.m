@@ -82,8 +82,8 @@ Nu = 2;
 
 %Constraints calculation
 delta_w = 50;
-tau_phi_max = 4*KT*ly*wo*delta_w;
-tau_theta_max = 4*KT*lx*wo*delta_w;
+tau_phi_max = 4*KT*lx*wo*delta_w;
+tau_theta_max = 4*KT*ly*wo*delta_w;
 tau_psi_max = 4*KD*wo*delta_w;
 delta_it = 4;
 
@@ -91,6 +91,8 @@ deltaU_max = [];%[8*m Inf Inf Inf]';
 deltaU_min = [];%[-4*m -Inf -Inf -Inf]';
 % deltaU_max = [8*m tau_phi_max/delta_it tau_theta_max/delta_it tau_psi_max/delta_it]';
 % deltaU_min = [-4*m -tau_phi_max/delta_it -tau_theta_max/delta_it -tau_psi_max/delta_it]';
+% deltaU_max = [8*m tau_phi_max/delta_it tau_theta_max/delta_it Inf]';
+% deltaU_min = [-4*m -tau_phi_max/delta_it -tau_theta_max/delta_it -Inf]';
 % deltaU_max = [8*m 1.2*angle_acel_max*Ixx 0.7*angle_acel_max*Iyy 1.5*angle_acel_max*Izz]';
 % deltaU_min = [-4*m -0.9*angle_acel_max*Ixx -1.3*angle_acel_max*Iyy -2*angle_acel_max*Izz]';
 % deltaU_max = [];%[8*m 0.1 0.1 0.1]';
@@ -100,12 +102,12 @@ deltaU_min = [];%[-4*m -Inf -Inf -Inf]';
 %deltaU_max = [8*m 1.2*angle_acel_max*Ixx Inf Inf]';
 %deltaU_min = [-4*m -0.9*angle_acel_max*Ixx -Inf -Inf]';
 
-% U_max = [2*m*g Inf Inf Inf]';
-% U_min = [-m*g -Inf -Inf -Inf]';
-% U_max = [2*m*g tau_phi_max tau_theta_max tau_psi_max]';
-% U_min = [-m*g -tau_phi_max -tau_theta_max -tau_psi_max]';
+% U_max = [2*m*g tau_phi_max Inf Inf]';
+% U_min = [-m*g -tau_phi_max -Inf -Inf]';
 U_max = [2*m*g tau_phi_max tau_theta_max Inf]';
 U_min = [-m*g -tau_phi_max -tau_theta_max -Inf]';
+% U_max = [2*m*g tau_phi_max tau_theta_max tau_psi_max]';
+% U_min = [-m*g -tau_phi_max -tau_theta_max -tau_psi_max]';
 % U_max = [2*m*g 1.2*angle_speed_max*Ixx 0.7*angle_speed_max*Iyy 1.5*angle_speed_max*Izz]';
 % U_min = [-m*g -0.9*angle_speed_max*Ixx -1.3*angle_speed_max*Iyy -2*angle_speed_max*Izz]';
 % U_max = [2*m*g 0.2 0.15 0.1]';
@@ -122,8 +124,8 @@ Y_max = [];%[10 Inf Inf Inf]';
 Y_min = [];%[-1.5 -Inf -Inf -Inf]';
  
 % Code parameters
-tol = 1e-7;
-n_plot = 20;
+tol = 1e-6;
+n_plot = 100;
 last_plot = 0;
 
 %Solver Options
@@ -154,6 +156,9 @@ tic
 while isempty(Lcand) == 0
     %fprintf('Exploradas: %d\nInexploradas: %d\nRegioes: %d\n\n',length(Lopt),length(Lcand),length(Regions));
     n = n+1;
+%     if n == 22
+%         disp('hue')
+%     end
     status_infesiable = 0;
     flag_verified = 0;
     flag_x_nan = 0;
@@ -175,6 +180,10 @@ while isempty(Lcand) == 0
             [G_tio, W_tio, S_tio, index, status_infesiable, flag_x_nan] = resolve_degenerancy(G, W, S, H, F, Lcand{end,2}, Lcand{end,3}, Nstate + Nref + Ncontrol, Ncontrol, Nout, Ny, Nu, Lcand{end,1}, tol, Lcand{end,4}, sdp_opt);
             %disp('Degen');
             index = sort(index);
+            if isequal(index,Lcand{end,1})
+                disp('ruim degen')
+            end
+            
             
             %Verify if the resulting index was already tested
             if ((check_if_verified(index, Lopt) == 1) && (status_infesiable == 0))
@@ -198,7 +207,10 @@ while isempty(Lcand) == 0
         
         if  (status_infesiable == 0) && (flag_verified == 0) 
             [A, b, type, origem] = define_region(G, W, S, G_tio, W_tio, S_tio, H, tol);
-             if ((isempty(A) == 0) && (sum((sum(isnan(A)))) == 0) && (sum((sum(isinf(A)))) == 0)) %Soma de todos os elementos de isnan(A)
+            if ((sum((sum(isnan(A)))) == 1) || (sum((sum(isinf(A)))) == 1))
+               disp('ruim') 
+            end
+            if ((isempty(A) == 0) && (sum((sum(isnan(A)))) == 0) && (sum((sum(isinf(A)))) == 0)) %Soma de todos os elementos de isnan(A)
               
                 A_old_test = A;
                 b_old_test = b;
@@ -210,7 +222,7 @@ while isempty(Lcand) == 0
 %                 Lcand{end,2} = A;
 %                 Lcand{end,3} = b;
                 [Kx, Ku] = define_control(G, W, S, G_tio, W_tio, S_tio, H, F, Ncontrol);
-             end           
+            end           
         end
         %Lopt = [Lopt; sort(Lcand{end,1})];
         if (n>1 && flag_verified == 0)

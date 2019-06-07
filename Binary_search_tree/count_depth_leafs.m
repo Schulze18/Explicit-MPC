@@ -1,6 +1,18 @@
 function [nodes_out, list_depth, number_leafs, max_depth] = count_depth_leafs(nodes)
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+%[nodes_out, list_depth, number_leafs, max_depth] = count_depth_leafs(nodes)
+%Calculate the main caracteristic of the BST
+%Inputs:
+%       nodes - cell array with the data fromthe BST
+%
+%Outputs:
+%       nodes_out - cell array with the depth of each node
+%
+%       list_depth - list of the number of leaf nodes per depth
+%
+%       number_leafs - number of leaf nodes
+%
+%       max_depth - maximum depth
+%
     list_depth = {};
     nodes_out = nodes;
     nodes_out{1,9} = 0;

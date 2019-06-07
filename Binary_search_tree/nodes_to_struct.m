@@ -1,6 +1,14 @@
 function [ nodes_struct ] = nodes_to_struct(Nodes)
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+%[ nodes_struct ] = nodes_to_struct(Nodes)
+%
+%Convert cell array with the BST to struct data type
+%Inputs:
+%       Nodes - a cell array with all the nodes from the BST
+%
+%Outputs:
+%       nodes_struct - struct array with six fields: A b left_node
+%       right_node parent_node Region
+%
 max_size_region = 1;
 number_state = size(Nodes{1,1},2);
 for i = 1:size(Nodes,1)

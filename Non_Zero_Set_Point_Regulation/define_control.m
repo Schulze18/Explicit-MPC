@@ -10,6 +10,8 @@ function [Kx, Kc] = define_control(G, W, S, G_tio, W_tio, S_tio, H, F, Ncontrol)
 %
 %       G_tio, W_tio and S_tio - rows of G, W and S corresponding to the active constraints
 %
+%       Ncontrol - number of control actions
+%
 %Outputs:
 %       Kx and Kc - coefficients from the control feedback law u(x) = Kx*x(t) + Kc
 %

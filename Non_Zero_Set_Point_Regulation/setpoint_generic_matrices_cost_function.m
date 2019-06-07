@@ -1,8 +1,8 @@
 function [H, F, Sx, Su, Qlinha, Rlinha, Clinha] = setpoint_generic_matrices_cost_function(A, B, C, Q, R, Nstate, Ncontrol, Nout, Ny, Nu)
 %[H, F, Sx, Su] = setpoint_generic_matrices_cost_function(A, B, C, Q, R, Nstate, Ncontrol, Ny, Nu)
 %
-%Return de matrices H and F from the reformulated cost function with U to
-%be opmitze.
+%Return de matrices H and F from the reformulated cost function for setpoint in a non-zero point regulation with U to
+%be optimize.
 %Inputs:
 %       A, B, C - matrices from the state-space equation x[t+1] = A*x[t] + B*u[t]
 %

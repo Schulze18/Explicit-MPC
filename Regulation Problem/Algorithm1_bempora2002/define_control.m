@@ -16,7 +16,7 @@ function [Kx, Kc] = define_control(G, W, S, G_tio, W_tio, S_tio, H, F)
 %Algoritm based on the paper "The explicit linear quadratic regulator for
 %constrained systems" by A. Bemporad, M. Morari, V. Dua, and E. Pistikopoulos. 
 
-    T = inv(H)*G_tio'*inv(G_tio*inv(H)*G_tio')
+    T = inv(H)*G_tio'*inv(G_tio*inv(H)*G_tio');
     Kx = (T*S_tio-inv(H)*F');
     Kc = T*W_tio;
     Kx = Kx(1,:);

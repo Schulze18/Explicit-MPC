@@ -21,7 +21,7 @@ index = [];
     for i = 1:length(W)
         %(G(i,:)*z0 - W(i,:) - S(i,:)*x0)
         if ((G(i,:)*z0 - W(i,:) - S(i,:)*x0 < tol) && (double(G(i,:)*z0 - W(i,:) - S(i,:)*x0)> -tol))
-            index = [index , i]
+            index = [index , i];
         end
     end
     G_tio = [];

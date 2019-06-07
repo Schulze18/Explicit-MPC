@@ -1,5 +1,5 @@
 function [xc , r, diagnostics] = chebychev_ball(A, b, G, W, S, H, F, Nstate, Ncontrol, Nout, Ny, Nu, options)
-%[xc , r, diagnostics] = chebychev_ball(A, b, G, W, S, H, F, Nu, Nstate)
+%[xc , r, diagnostics] = chebychev_ball(A, b, G, W, S, H, F, Nstate, Ncontrol, Nout, Ny, Nu, options)
 %
 %Return the center of the largest possible ball that can be placed inside
 %the region defined by Ax<=b (Chebyshev center) and that Vz(x) is feasible.
@@ -10,6 +10,13 @@ function [xc , r, diagnostics] = chebychev_ball(A, b, G, W, S, H, F, Nstate, Nco
 %                          Vz(x) = 0.5*z'*H*z 
 %                                 through z 
 %                                 subject to G*z <= W + S*x(t)
+%       
+%       Nstate, Ncontrol, Nout - number of states, control actions and
+%       outputs of the system
+%
+%       Ny, Nu - prediction and control horizon 
+%
+%       options - solver options for yalmip 
 %
 %Outputs:
 %       xc - Chebyshev center

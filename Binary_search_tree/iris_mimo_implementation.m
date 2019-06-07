@@ -50,7 +50,7 @@ Cc = [1 0 0 0 0 0 0 0;
  Nref = Nout;
  
  
-Nsim = 15000;
+Nsim = 1500;
 x = zeros(Nstate,Nsim);
 y = zeros(Nout,Nsim);
 u = y;
@@ -66,15 +66,15 @@ ref = zeros(4,Nsim);
 
 for i = 1:Nsim
     if i < (Nsim/2)
-        ref(:,i) = [2 0 0 0]';
+        ref(:,i) = [2 0.1 0 0]';
     else
-        ref(:,i) = [1 0 0 0]';
+        ref(:,i) = [1 0.1 -0.4 0]';
     end
 end  
 %%
 ruim = {};
 for i = 2:Nsim
-    i
+    i;
 % %     %U Controller
 % %     index = 0;
 % %     y(:,i) = C*x(:,i); 

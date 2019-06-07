@@ -105,11 +105,11 @@ function [G, W, E, S, num_Gu, G_x2, W_x2, E_x2] = regulation_constraints_reformu
 %         
     end
     
-    if isempty(Refmin) == 0
-        G_r = zeros(2*num_ref,num_control*Nu);
-        E_r = [zeros(1,num_state) -1; zeros(1,num_state) 1];
-        W_r = [Refmax; (-Refmin)'];
-    end
+%     if isempty(Refmin) == 0
+%         G_r = zeros(2*num_ref,num_control*Nu);
+%         E_r = [zeros(1,num_state) -1; zeros(1,num_state) 1];
+%         W_r = [Refmax; (-Refmin)'];
+%     end
     
  
 %     W = [W_u; W_x];
@@ -125,9 +125,9 @@ function [G, W, E, S, num_Gu, G_x2, W_x2, E_x2] = regulation_constraints_reformu
     
     %W_x =[];G_x=[];E_x=[];
     
-    W = [W_u; W_x; W_r];% Wxx];
-    G = [G_u ; G_x; G_r];% Gxx];
-    E = [E_u ; E_x; E_r];% Exx];
+    W = [W_u; W_x];%; W_r];% Wxx];
+    G = [G_u ; G_x];%; G_r];% Gxx];
+    E = [E_u ; E_x];%; E_r];% Exx];
     %G_x
 %     W = W(1:17,:);
 %     G = G(1:17,:);

@@ -1,6 +1,13 @@
 function [ineq] = verifiy_total_ineq(Regions)
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+%[ineq] = verifiy_total_ineq(Regions)
+%List all inequations in a set of Regions
+%Inputs:
+%       Regions - cell array with all the regions from the explicit
+%       controller  
+%
+%Outputs:
+%       ineq - set of all the inequations
+%   
     total_ineq = 0;
     ineq = {};
     for i = 1:size(Regions,1)

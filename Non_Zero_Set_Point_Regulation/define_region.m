@@ -7,11 +7,19 @@ function [A, b, type, origem] = define_region(G, W, S, G_tio, W_tio, S_tio, H, t
 %
 %       G_tio, W_tio and S_tio - rows of G, W and S corresponding to the active constraints
 %
+%       H - matrix from the cost function
+%
+%       tol - tolerance to consider something zero
+%
 %Outputs:
 %       A, b - matrices that define the polyhedral Ax <= b
 %
-%Algoritm based on the paper "The explicit linear quadratic regulator for
-%constrained systems" by A. Bemporad, M. Morari, V. Dua, and E. Pistikopoulos. 
+%       type - array with the type from each hyperplane A(i)x <= b(i)
+%
+%       origem - array of the constraints that generated the hyperplane A(i)x <= b(i)
+%
+%Algoritm based on the paper "An Algorithm for Multi-Parametric Quadratic Programming and 
+% Explicit MPC Solutions" by P. Tondel, T. A. Johansen, and A. Johansen. 
 
 
     T = (inv(H)*G_tio'*inv(G_tio*inv(H)*G_tio'));
@@ -29,9 +37,8 @@ function [A, b, type, origem] = define_region(G, W, S, G_tio, W_tio, S_tio, H, t
     type = [];
     
     
-    %Indica que as restrições geradas pela eq 13 nao estao relacionadas a
-    %nenhum outro indice, não é exatamente isso, mas facilita o algoritmo
-    
+    %Indicate that the constraints from Eq. 13 are not related to other index, this information is only used to make easier the code
+    %Indica que as restrições geradas pela eq 13 nao estao relacionadas a nenhum outro indice, não é exatamente isso, mas facilita o algoritmo
     %origem = zeros(size(A_2,1),1);
     origem = [];
     

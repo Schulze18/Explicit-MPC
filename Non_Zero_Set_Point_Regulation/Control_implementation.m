@@ -47,7 +47,7 @@ Ts = 0.1;
 Nstate = size(A,1);
 Ncontrol = size(B,2);
 
-Nsim = 100;
+Nsim = 150;
 x = zeros(Nstate,Nsim);
 y = zeros(Nsim,1);
 u = y;

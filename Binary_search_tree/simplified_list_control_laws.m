@@ -1,5 +1,15 @@
 function [controls] = simplified_list_control_laws(Regions, tol)
-%UNTITLED2 Summary of this function goes here
+%[controls] = list_control_laws(Regions, set_ineq, tol)
+%List all the control laws in the Regions without comparing do inequations
+%Inputs:
+%       Regions - cell array with all the regions from the explicit
+%       controller
+%
+%       tol - tolerance to consider something zero     
+%
+%Outputs:
+%       controls - list of the control laws
+%   
 %   
     %%%%controls = Kx Kc regions_pos ineq_pos regions_neg ineq_neg 
     % controls = Kx Kc regions_within

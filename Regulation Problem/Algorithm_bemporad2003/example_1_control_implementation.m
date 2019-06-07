@@ -79,16 +79,16 @@ for i= 1:Nsim
 end
 figure(15)
 hold on
-%stairs(x_online(1,:),'k')
+stairs(x_online(1,:),'k')
 hold on
 stairs(x_online(2,:),'g')
-legend('x1','x2','x1_online','x2_online')
+legend('x1','x2','x1_{online}','x2_{online}')
 title('Offline x MPCqp')
 
 figure(16)
 hold on
 stairs(u_online,'r')
-legend('u','u_online')
+legend('u','u_{online}')
 title('Offline x MPCqp')
 
 figure(1)

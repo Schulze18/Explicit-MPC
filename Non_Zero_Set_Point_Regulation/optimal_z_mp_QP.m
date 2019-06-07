@@ -1,5 +1,5 @@
 function [z0, diagnostics] = optimal_z_mp_QP(G, W, S, H, F, x0, Nstate, Ncontrol, Nout, Ny, Nu, options)
-%[z0, diagnostics] = optimal_z_mp_QP(G, W, S, H, F, x0, Nu)
+%[z0, diagnostics] = optimal_z_mp_QP(G, W, S, H, F, x0, Nstate, Ncontrol, Nout, Ny, Nu, options)
 %
 %Calculate the optmizal z to the mp-QP problem: 
 %V(x) = min 0.5*z'*H*z , subject to Gz <= W +S*x(t)
@@ -11,7 +11,12 @@ function [z0, diagnostics] = optimal_z_mp_QP(G, W, S, H, F, x0, Nstate, Ncontrol
 %    
 %       x0 - feasible point inside the polyhedral set 
 %    
-%       Nu - control horizon                       
+%       Nstate, Ncontrol, Nout - number of states, control actions and
+%       outputs of the system
+%
+%       Ny, Nu - prediction and control horizon 
+%
+%       options - solver options for yalmip 
 % 
 %Outputs:
 %       z0 - optimal solution

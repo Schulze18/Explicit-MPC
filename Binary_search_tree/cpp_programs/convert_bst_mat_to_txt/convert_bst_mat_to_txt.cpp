@@ -7,10 +7,12 @@
 
 void write_double_to_file(double *element, std::ofstream *file) {
 	(*file).write((char*)&(*element), sizeof(*element));
+	//(*file).write(reinterpret_cast<const char*>(&(*element)), sizeof(*element));
 }
 
 void write_int_to_file(int *element, std::ofstream *file) {
 	(*file).write((char*)&(*element), sizeof(*element));
+	//(*file).write(reinterpret_cast<const char*>(&(*element)), sizeof(*element));
 }
 
 void export_regions_to_file(struct_control_param *control_param, std::vector<struct_regions> *regions, const char *filename) {
@@ -44,7 +46,7 @@ void export_regions_to_file(struct_control_param *control_param, std::vector<str
 
 void export_bst_to_file(struct_control_param *control_param, std::vector<struct_bst> *bst_nodes , const char *filename){
 
-    std::ofstream file_bst(filename, std::ios::out | std::ios::binary);
+	std::ofstream file_bst(filename, std::ios::out | std::ios::binary);
 
 	//Export total number of regions
 	write_int_to_file(&((*control_param).total_nodes), &file_bst);
@@ -67,7 +69,7 @@ void export_bst_to_file(struct_control_param *control_param, std::vector<struct_
 		write_int_to_file(&((*bst_nodes)[index_node].parent_node), &file_bst);
 
         //Export Number of regions
-        int number_regions_node = (*bst_nodes)[index_node].regions.size();
+        int number_regions_node = (int) (*bst_nodes)[index_node].regions.size();
         write_int_to_file(&number_regions_node,&file_bst);
 
         //Export regions
@@ -143,8 +145,8 @@ void get_struct_bst_from_mat(struct_control_param *control_param, std::vector<st
 	mxArray **bst_elements;
 	bst_elements = (mxArray **)mxGetData(mat_data_nodes);
 
-	(*control_param).number_fields_bst = mxGetN(mat_data_nodes);//mxGetNumberOfFields(mat_struct_regions);
-	(*control_param).total_nodes = mxGetM(mat_data_nodes);//mxGetNumberOfElements(mat_struct_regions);
+	(*control_param).number_fields_bst = (int) mxGetN(mat_data_nodes);//mxGetNumberOfFields(mat_struct_regions);
+	(*control_param).total_nodes = (int) mxGetM(mat_data_nodes);//mxGetNumberOfElements(mat_struct_regions);
 
 
     for (int index_node = 0; index_node < (*control_param).total_nodes; index_node++) {
@@ -152,24 +154,24 @@ void get_struct_bst_from_mat(struct_control_param *control_param, std::vector<st
 
         //Reading index ineq from .mat
 		double *pointer_ineq_index = mxGetPr(bst_elements[2 * (*control_param).total_nodes + index_node]);
-		int number_index = mxGetM(bst_elements[2 * (*control_param).total_nodes + index_node]);
+		int number_index = (int) mxGetM(bst_elements[2 * (*control_param).total_nodes + index_node]);
 		std::vector<int> temp_index(pointer_ineq_index, pointer_ineq_index + number_index);
 
 		(*bst_nodes)[index_node].ineq_index = temp_index[number_index - 1];
 
         //Reading left node from .mat	
-		(*bst_nodes)[index_node].left = *(mxGetPr(bst_elements[4 * (*control_param).total_nodes + index_node]));
+		(*bst_nodes)[index_node].left = (int) *(mxGetPr(bst_elements[4 * (*control_param).total_nodes + index_node]));
 		
 		//Reading right node from .mat
-		(*bst_nodes)[index_node].right = *(mxGetPr(bst_elements[5 * (*control_param).total_nodes + index_node]));
+		(*bst_nodes)[index_node].right = (int) *(mxGetPr(bst_elements[5 * (*control_param).total_nodes + index_node]));
 
 		//Reading parent node from .mat
-		(*bst_nodes)[index_node].parent_node = *(mxGetPr(bst_elements[6 * (*control_param).total_nodes + index_node]));
+		(*bst_nodes)[index_node].parent_node = (int) *(mxGetPr(bst_elements[6 * (*control_param).total_nodes + index_node]));
 
 		
 		//Reading all the regions nodes
 		double *pointer_regions = mxGetPr(bst_elements[3 * (*control_param).total_nodes + index_node]);
-		int number_region_node = mxGetM(bst_elements[3 * (*control_param).total_nodes + index_node]);
+		int number_region_node = (int) mxGetM(bst_elements[3 * (*control_param).total_nodes + index_node]);
 		(*bst_nodes)[index_node].regions.assign(pointer_regions, pointer_regions + number_region_node);
 
     }
@@ -186,14 +188,14 @@ void get_struct_regions_from_mat(struct_control_param *control_param, std::vecto
     //Get struct from the .mat, it is maybe necessary to change the struct name
     mxArray *mat_data_regions = matGetVariable(pmat_regions, "Regions");
 
-	(*control_param).number_fields_regions = mxGetN(mat_data_regions);//mxGetNumberOfFields(mat_struct_regions);
-	(*control_param).total_regions = mxGetM(mat_data_regions);//mxGetNumberOfElements(mat_struct_regions);
+	(*control_param).number_fields_regions = (int) mxGetN(mat_data_regions);//mxGetNumberOfFields(mat_struct_regions);
+	(*control_param).total_regions = (int) mxGetM(mat_data_regions);//mxGetNumberOfElements(mat_struct_regions);
 	
 	mxArray **element_region;
 	element_region = (mxArray **)mxGetData(mat_data_regions);
 
-	(*control_param).number_states = mxGetN(element_region[2 * (*control_param).total_regions]);
-	(*control_param).number_controls_actions = mxGetM(element_region[2 * (*control_param).total_regions]);
+	(*control_param).number_states = (int) mxGetN(element_region[2 * (*control_param).total_regions]);
+	(*control_param).number_controls_actions = (int) mxGetM(element_region[2 * (*control_param).total_regions]);
 	
     for (int index_region = 0; index_region < (*control_param).total_regions; index_region++) {
         (*regions).push_back(struct_regions());
@@ -227,8 +229,8 @@ void get_struct_ineq_from_mat(struct_control_param *control_param, std::vector<s
 	//Get struct from the .mat, it is maybe necessary to change the struct name
 	mxArray *mat_data_ineq = matGetVariable(pmat_ineq, "ineq_pos");
 
-	(*control_param).total_ineq = mxGetM(mat_data_ineq);//mxGetNumberOfElements(mat_struct_regions);
-	(*control_param).number_fields_ineq = mxGetN(mat_data_ineq);
+	(*control_param).total_ineq = (int) mxGetM(mat_data_ineq);//mxGetNumberOfElements(mat_struct_regions);
+	(*control_param).number_fields_ineq = (int) mxGetN(mat_data_ineq);
 
 	mxArray **element_ineq;
 	element_ineq = (mxArray **)mxGetData(mat_data_ineq);

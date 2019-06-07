@@ -1,7 +1,23 @@
 function [ index_ineq ] = define_inequation_node(nodes, index_node, set_ineq, branch_index, controls)
-%UNTITLED5 Summary of this function goes here
-%   Detailed explanation goes here
-
+%[ index_ineq ] = define_inequation_node(nodes, index_node, set_ineq, branch_index, controls)
+%Define the inequation to be testes in the node
+%
+%Inputs:
+%       nodes - cell array with the BST determined until now
+%
+%       index_node - index in the cell array from the evaluated node
+%
+%       set_ineq - set of all the inequations
+%
+%       branch_index - sequente of inequations to be "tested" in the branch
+%       until the evaluated node
+%
+%       controls - list of all the control laws       
+%
+%Outputs:
+%       index_ineq - Index of the inequation in the set of all the
+%       inequations
+%
     %Find inequation that define the regions but were not used
     set_new_index_ineq = [];
     for i = 1:size(nodes{index_node,4},1)   

@@ -1,7 +1,17 @@
 function [ ineq_out ] = which_region_ineq(ineq, Regions,tol)
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
-
+%[ ineq_out ] = which_region_ineq(ineq, Regions,tol)
+%
+%Verify the inequations present in the Regions definition
+%Inputs:
+%       ineq - set of inequations
+%
+%       Regions - cell array with the regions from the Explicit MPC
+%
+%       tol - tolerance to consider something zero
+%
+%Outputs:
+%       ineq_out - set of inequation with regions and controls law
+%
     ineq_out = ineq;
     for i = 1:size(ineq,1)
         ineq_out{i,3} = [];

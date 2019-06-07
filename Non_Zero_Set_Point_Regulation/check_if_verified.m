@@ -1,6 +1,14 @@
 function [ status_check ] = check_if_verified(possible_new_set, Lopt)
-%UNTITLED8 Summary of this function goes here
-%   Detailed explanation goes here
+%[ status_check ] = check_if_verified(possible_new_set, Lopt)
+%
+%Check if a combination of constraints was already verified
+%Inputs:
+%       possible_new_set - candidate set of constraints
+%
+%       Lopt - list of already verified constraints
+%
+%Outputs:
+%       status_check - true if it was already verified
     possible_new_set = sort(possible_new_set);
     
     status_check = false;

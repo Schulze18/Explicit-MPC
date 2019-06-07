@@ -18,6 +18,9 @@ function [H, F, Sx, Su] = matrices_cost_function_reformulation(A, B, P, Q, R, Ny
 %              V(x(t)) = 0.5*x'*Y*x + min {0.5*U'*H*U + x'*F*U}
 %                                     through U 
 %                                     subject to G*U <= W + E*x
+%       
+%       Sx, Su - matrices from the state space over the prediction and control
+%       horizon: X = Sx*x[t] + Su*U
 %
 %Algoritm based on the paper "The explicit linear quadratic regulator for
 %constrained systems" by A. Bemporad, M. Morari, V. Dua, and E. Pistikopoulos. 

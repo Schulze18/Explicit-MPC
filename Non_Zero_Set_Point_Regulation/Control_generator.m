@@ -87,6 +87,15 @@ tol = 1e-7;
 n_plot = 4;
 last_plot = 0;
 
+%Solver Options
+sdp_opt = sdpsettings;
+sdp_opt.solver = 'sdpt3';
+sdp_opt.verbose = 0;
+sdp_opt.cachesolvers = 1;
+sdp_opt.sdpt3.maxit = 30;
+sdp_opt.sdpt3.steptol = 1.0000e-5;
+sdp_opt.sdpt3.gaptol = 5.000e-5;
+
 %% Generate Basic Matrices
 [H, F, Sx, Su, Syx, Syu] = regulation_matrices_cost_function(A, B, C, P, Q, R, Ny, Nu);
 
@@ -157,7 +166,7 @@ while isempty(Lcand) == 0
              if ((isempty(A) == 0) && (sum((sum(isnan(A)))) == 0) && (sum((sum(isinf(A)))) == 0)) %Soma de todos os elementos de isnan(A)
               
 
-                [A, b, type, origem] = remove_redundant_constraints(A, b, type, origem, Nu, Nstate);
+                [A, b, type, origem] = remove_redundant_constraints(A, b, type, origem, Nu, Nstate, sdp_opt);
 %                 Lcand{end,2} = A;
 %                 Lcand{end,3} = b;
                 [Kx, Ku] = define_control(G, W, S, G_tio, W_tio, S_tio, H, F, Ncontrol);
@@ -175,7 +184,7 @@ while isempty(Lcand) == 0
         origem = (1:size(G,1))';
         type = ones(size(G,1),1);
         %type(5:end) = 2;
-        [A, b, type, origem] = remove_redundant_constraints(A, b, type, origem, Nu, Nstate);
+        [A, b, type, origem] = remove_redundant_constraints(A, b, type, origem, Nu, Nstate, sdp_opt);
         Kx = (-inv(H)*F');
         Kx = Kx(1:Ncontrol,:);
         Ku = zeros(Ncontrol,1);

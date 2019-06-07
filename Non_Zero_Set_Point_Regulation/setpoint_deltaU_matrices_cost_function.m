@@ -1,13 +1,15 @@
 function [H, F, Sx, Su, Sdu, T_du, Qlinha, Rulinha, Rdulinha, Clinha] = setpoint_deltaU_matrices_cost_function(A, B, C, Q, Ru, Rdu, Nstate, Ncontrol, Nout, Ny, Nu)
-%[H, F, Sx, Su, Sdu, Qlinha, Rlinha, Clinha] = setpoint_deltaU_matrices_cost_function(A, B, C, Q, R, Nstate, Ncontrol, Nout, Ny, Nu)
+%[H, F, Sx, Su, Sdu, T_du, Qlinha, Rulinha, Rdulinha, Clinha] = setpoint_deltaU_matrices_cost_function(A, B, C, Q, Ru, Rdu, Nstate, Ncontrol, Nout, Ny, Nu)
 %
-%Return de matrices H and F from the reformulated cost function with U to
-%be opmitze.
+%Return de matrices H and F from the reformulated cost function for setpoint in a non-zero point regulation with Delta U to
+%be optimize.
 %Inputs:
-%       A, B, C - matrices from the state-space equation x[t+1] = A*x[t] + B*u[t]
+%       A, B, C - matrices from the state-space equation x[t+1] = A*x[t] +
+%       B*u[t]; y[t] = C*x[t]
 %
-%       Q, R - weighting matrices from the cost function:
-%                 J(U,x[t]) = sum(k=0,...,Ny){(Yref - Yk)'*Q*(Yref - Yk)} + sum(k=0,...,Nu-1){uk'*Q*uk}
+%       Q, Ru, Rdu - weighting matrices from the cost function:
+%                 J(U,x[t]) = sum(k=0,...,Ny){(Yref - Yk)'*Q*(Yref - Yk)} +
+%                 sum(k=0,...,Nu-1){uk'*Ru*uk} + sum(k=0,...,Nu-1){delta_uk'*Rdu*delta_uk}
 %               
 %       Nstate - number of states
 %
@@ -25,8 +27,13 @@ function [H, F, Sx, Su, Sdu, T_du, Qlinha, Rulinha, Rdulinha, Clinha] = setpoint
 %                                     through U 
 %                                     subject to G*U <= W + E*x
 %
-%Algoritm based on the paper "The explicit linear quadratic regulator for
-%constrained systems" by A. Bemporad, M. Morari, V. Dua, and E. Pistikopoulos. 
+%       Sx, Su, Sdu, Clinha - matrices from the state space over the prediction and control
+%       horizon: X = Sx*x[t] + Su*u0 + Sdu*Delta_U; Y = Clinha*X
+%
+%       T_du - auxiliary matrix
+%
+%       Qlinha, Rulinha, Rdulinha - diagonal matrix constructed with Q, Ru,
+%       Rdu
     
     Sx = eye(Nstate);
     for i = 1:Ny

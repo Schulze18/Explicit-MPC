@@ -1,7 +1,29 @@
 function  [G, W, E, S, num_Gu] = setpoint_generic_constraints(Sx, Su, Clinha, H, F, Nstate, Ncontrol, Nout, Nref, Ny, Nu, U_max, U_min, Ref_max, Ref_min, X_max, X_min, Y_max, Y_min)
-%function  [G_u, W_u, E_u, G_u_max, W_u_max, E_u_max, G_r, W_r, E_r,num_Gu] = setpoint_generic_constraints(Sx, Su, Clinha, H, F, Nstate, Ncontrol, Nout, Nref, Ny, Nu, U_max, U_min, X_max, X_min, Ref_max,Ref_min)
-%UNTITLED2 Summary of this function goes here
-%   Detailed explanation goes here
+%function [G, W, E, S, num_Gu] = setpoint_generic_constraints(Sx, Su, Clinha, H, F, Nstate, Ncontrol, Nout, Nref, Ny, Nu, U_max, U_min, Ref_max, Ref_min, X_max, X_min, Y_max, Y_min)
+%
+%Return the constraints matrices G, W and E from the reformulated cost function for setpoint in a non-zero point regulation with Delta U to
+%be optimize.
+%Inputs:
+%       H, F - from the cost function:
+%              V(x(t)) = 0.5*x'*Y*x + min {0.5*U'*H*U + x'*F*U}
+%                                     through U 
+%                                     subject to G*U <= W + E*x
+%
+%       Sx, Su, Sdu, Clinha - matrices from the state space over the prediction and control
+%       horizon: X = Sx*x[t] + Su*u0 + Sdu*Delta_U; Y = Clinha*X
+%               
+%       Nstate, Ncontrol, Nout, Nref - number of states, control actions,
+%       outputs and references from the system
+%
+%       Ny, Ny - prediction and control horizon
+%
+%       U_max, U_min, Ref_max, Ref_min, X_max, X_min, Y_max, Y_min - array with the max and min values
+%
+%Outpus:
+%        G, W, E and S - from the matrix inequalities G*z <= W + S*x(t) and GU <= W + Ex(t) 
+%
+%        num_Gu - number of rows from G related to constraints in control
+%        action U
 
     G_u = [];
     G_x = [];

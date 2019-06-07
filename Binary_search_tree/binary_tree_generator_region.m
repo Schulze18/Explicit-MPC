@@ -2,15 +2,25 @@ clear all
 clc
 tol = 1e-6;
 
-%load('regions_10_4_u_du.mat');
-load('/File_results/regions_10_2_u_all_v2.mat');
-%Step 1 - Algorithm 2 - Computation all the I(j+) and I(j-)
-%%
+%% Load Regions
+% load('File_results/regions_10_3_u_du.mat');
+% load('File_results/all_data_10_3_u2.mat')
+% load('File_results/regions_10_2_u_all_v2.mat');
+load('File_results/regions_10_2_u3.mat');
+load('File_results/all_data_10_2_u3.mat');
+
+% load('File_results/all_data_exemplo_tcc.mat');
+
+%% Step 1 - Algorithm 2 - Computation all the I(j+) and I(j-)
+%% Verify or load all the inequations
 ineq_pos = verifiy_total_ineq(Regions);
-%load('ineq_10_4_u_du.mat');   
-%load('/File_results/ineq_v2_10_4_u_du.mat');
+% load('File_results/ineq_dj_10_3_u2.mat')
+% load('File_results/ineq_10_3_u_du_v_opt_test');   
+% load('/File_results/ineq_10_2_u3_du3.mat');
+% load('File_results/ineq_10_2_u_all_v2.mat');
 ineq_neg = cellfun(@(x) x*(-1),ineq_pos,'un',0);
 
+% load('File_results/chebs_center_10_2_u_all_v2.mat');
 
 %%
 ineq_test = which_region_ineq(ineq_pos,Regions,tol);
@@ -18,25 +28,69 @@ ineq_test = which_region_ineq(ineq_pos,Regions,tol);
 %%
 %Solver configurations
 solver_opt = sdpsettings;
-solver_opt.solver='sedumi';
+solver_opt.solver = 'glpk';
 solver_opt.verbose = 0;
+solver_opt.debug = 0;
 solver_opt.cachesolvers = 1;
-solver_opt.sdpt3.maxit = 20;
-solver_opt.sdpt3.steptol = 1.0000e-07;
-solver_opt.sdpt3.gaptol = 5.000e-7;
-solver_opt.sedumi.eps = 5.0000e-04;
-solver_opt.sedumi.maxiter = 20;
+solver_opt.warning = 0;
+% solver_opt.sdpt3.maxit = 20;
+% solver_opt.sdpt3.steptol = 1.0000e-07;
+% solver_opt.sdpt3.gaptol = 5.000e-7;
+% solver_opt.sedumi.eps = 1.0000e-08;
+% solver_opt.sedumi.maxiter = 100;
+% solver_opt.quadprog.MaxIter = 50;
+% solver_opt.removeequalities = -1;
+% solver_opt.saveduals = 0;
 
+
+%% Classify regions by intersection
+chebychev_centers = zeros(size(Regions,1),Nref+Nout+Nstate);
+% chebychev_centers = zeros(size(Regions,1), Nstate);
+for i = 1:size(Regions,1)
+    %chebychev_centers(end+1,:) = chebychev_ball(Regions{i,1}, Regions{i,2}, [], [], [], [], [], 16, 4, 4, 10, 2, solver_opt);
+%     chebychev_centers(i,:) = chebychev_ball(Regions{i,1}, Regions{i,2}, G, W, S, H, F, 16, 4, 4, 10, 2, solver_opt);
+    chebychev_centers(i,:) = chebychev_ball(Regions{i,1}, Regions{i,2}, G, W, S, H, F, Nref+Nout+Nstate, Ncontrol, Nout, Ny, Nu, solver_opt);
+%     chebychev_centers(i,:) = chebychev_ball(Regions{i,1}, Regions{i,2}, G, W, S, H, F, Nstate, Ncontrol, Nout, Ny, Nu, solver_opt);
+end
+
+%
+% solver_opt.sedumi.maxiter = 1;
 tic
 for i = 1:size(ineq_pos,1)
-    i
     for j = 1:size(Regions,1)
-        result = side_ineq_region(ineq_pos(i,:),Regions(j,:), solver_opt);
-        ineq_pos{i,6}(j,1) = result;
+%         j
+%         if j == 2
+%             disp('hue')
+%         end
+        result2 = side_ineq_region_intersec(ineq_pos(i,:),Regions(j,:), chebychev_centers(j,:)', solver_opt);
+        ineq_pos{i,8}(j,1) = result2;
+%         ineq_pos{i,7}(j,1) = result2;
+%         result = side_ineq_region_intersec_feasible(ineq_pos(i,:),Regions(j,:), chebychev_centers(j,:)');
+%         ineq_pos{i,8}(j,1) = result;
     end
     toc
 end
-toc
+ineq_pos(:,6) = ineq_pos(:,8);
+
+%% Classify regions with original algorithm
+%
+% warm_vec = zeros(size(Regions,1),size(Regions{1,1},2));
+% % solver_opt.usex0 = 1;
+%
+% tic
+% for i = 1:size(ineq_pos,1)
+%     %i
+%     for j = 1:size(Regions,1)
+%         result = side_ineq_region(ineq_pos(i,:),Regions(j,:), solver_opt);
+% %         [result, warm_value] = side_ineq_region_warm(ineq_pos(i,:),Regions(j,:), solver_opt, warm_vec(j,:)');
+%         ineq_pos{i,6}(j,1) = result;
+% %         warm_vec(j,:) = warm_value';
+%      %   delta_time = toc - time_old
+%       %  time_old = toc;
+%     end
+%     toc
+% end
+% toc
 
 %% List all the control laws
 controls = list_control_laws(Regions, ineq_pos, tol);
@@ -76,7 +130,7 @@ nodes{1,8} = [];                    %parent inequations side
 
 %%
 
-it_max = 10*1500;
+it_max = 25*1500;
 it = 0;
 while isempty(unex_node) == 0 && it < it_max 
     it = it + 1;
@@ -166,9 +220,9 @@ while isempty(unex_node) == 0 && it < it_max
     controls_remaining = simplified_list_control_laws(Regions_remaining,tol);
     
     
-    %%%%%controls_remaining = 4; %%%%%%%
-    %%%if size(nodes{index_node,4},1) < 4
-    if size(controls_remaining,1) < 3
+%     controls_remaining = zeros(4); %%%%%%%
+%     if size(nodes{index_node,4},1) < 4
+    if size(controls_remaining,1) < 5
         for i = 1:size(nodes{index_node,4},1)
             index_side(i) = ineq_pos{nodes{index_node,3}(end,1),6}(nodes{index_node,4}(i,1),1);
         end

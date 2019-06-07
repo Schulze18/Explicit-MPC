@@ -1,6 +1,15 @@
 function [ ineq ] = side_ineq_control(ineq, controls)
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+%[ ineq ] = side_ineq_control(ineq, controls)
+%
+%Classify each control for each inequation
+%Inputs:
+%       ineq - set of inequations
+%
+%       control - set of control laws
+%
+%Outputs:
+%       ineq - set of inequations with the information for each control law
+%
     for i = 1:size(ineq,1)
         
         ineq{i,7} = zeros(size(controls,1),1);
