@@ -20,8 +20,8 @@ I will post the abstract from my work and the version in portuguese in the near 
 If you have any doubts, feel free to ask me.
 
 ## Software Versions:
-MATLAB R2016a\  
-Simulink 8.7\  
+MATLAB R2016a\
+Simulink 8.7\
 ROS Kinetic\
 Gazebo 7\
 
