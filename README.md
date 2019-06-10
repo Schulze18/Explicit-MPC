@@ -6,7 +6,7 @@ Files from my undegraduate thesis **Off-line Model Predictive Control applied to
 Algorithms for implementation the Explicit MPC presented in **The explicit linear quadratic regulator for constrained systems** and **An algorithm for multi-parametric quadratic programming and explicit mpc solutions**.
 
 */Non_Zero_Set_Point_Regulation*\
-Projet of a setpoint regulator for the quadcopter Iris 3DR. I recommend to use this files as the base of your application, the degeneration problem is full solved in this codes. 
+Project of a setpoint regulator for the quadcopter Iris 3DR. I recommend to use this files as the base of your application, the degeneration problem is full solved in this codes. 
 
 */Binary_search_tree*\
 Algorithms to representate the PWA from Explicit MPC using Binary Search Tree as presented in **Computation and Approximation of Piecewise Affine Control Laws
