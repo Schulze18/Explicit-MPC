@@ -23,7 +23,7 @@ If you have any doubts, feel free to ask me.
 MATLAB R2016a\
 Simulink 8.7\
 ROS Kinetic\
-Gazebo 7\
+Gazebo 7
 
 ## Dependencies:
 plotregion (optional) - [Link](https://www.mathworks.com/matlabcentral/fileexchange/9261-plot-2d-3d-region?focused=5143921&tab=function)\
