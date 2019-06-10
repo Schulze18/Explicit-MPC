@@ -6,7 +6,7 @@ Files from my undegraduate thesis **Off-line Model Predictive Control applied to
 Algorithms for implementation the Explicit MPC presented in **The explicit linear quadratic regulator for constrained systems** and **An algorithm for multi-parametric quadratic programming and explicit mpc solutions**.
 
 */Non_Zero_Set_Point_Regulation*\
-Implementation of a regulator in a setpoint for the quadcopter Iris 3DR. I recommend to use this files as the base of your application, the degeneration problem is full solved in this codes. 
+Projet of a setpoint regulator for the quadcopter Iris 3DR. I recommend to use this files as the base of your application, the degeneration problem is full solved in this codes. 
 
 */Binary_search_tree*\
 Algorithms to representate the PWA from Explicit MPC using Binary Search Tree as presented in **Computation and Approximation of Piecewise Affine Control Laws
@@ -26,6 +26,7 @@ ROS Kinetic\
 Gazebo 7\
 
 ## Dependencies:
+plotregion (optional) - [Link](https://www.mathworks.com/matlabcentral/fileexchange/9261-plot-2d-3d-region?focused=5143921&tab=function)\
 YALMIP - [Link](https://yalmip.github.io/download/)\
 SeDuMi - [Link](http://sedumi.ie.lehigh.edu/)\
 SDTP3 - [Link](http://www.math.nus.edu.sg/~mattohkc/sdpt3.html)\
