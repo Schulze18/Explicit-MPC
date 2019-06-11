@@ -14,6 +14,9 @@ function [index, G_tio, W_tio, S_tio] = verify_active_constraints(G, W, S, x0, z
 %Outputs:
 %       G_tio, W_tio and S_tio - rows of G, W and S corresponding to the active constraints
 %
+%       index - number of the rows from G, W and S related to active
+%       constraints
+%
 %Algoritm based on the paper "The explicit linear quadratic regulator for
 %constrained systems" by A. Bemporad, M. Morari, V. Dua, and E. Pistikopoulos. 
 
@@ -21,7 +24,7 @@ index = [];
     for i = 1:length(W)
         %(G(i,:)*z0 - W(i,:) - S(i,:)*x0)
         if ((G(i,:)*z0 - W(i,:) - S(i,:)*x0 < tol) && (double(G(i,:)*z0 - W(i,:) - S(i,:)*x0)> -tol))
-            index = [index , i]
+            index = [index , i];
         end
     end
     G_tio = [];

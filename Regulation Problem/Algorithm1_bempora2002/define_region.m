@@ -7,6 +7,10 @@ function [A, b] = define_region(G, W, S, G_tio, W_tio, S_tio, H, tol)
 %
 %       G_tio, W_tio and S_tio - rows of G, W and S corresponding to the active constraints
 %
+%       H - from the cost function
+%
+%       tol - tolerance to consider something zero
+%
 %Outputs:
 %       A, b - matrices that define the polyhedral Ax <= b
 %

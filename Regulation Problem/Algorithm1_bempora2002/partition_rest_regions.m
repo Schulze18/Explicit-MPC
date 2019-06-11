@@ -16,6 +16,8 @@ function [Regions] = partition_rest_regions(Rest_regions, G, W, S, H, F, tol, Nu
 %
 %       Nu - control horizon 
 %
+%       Nstate - number of states
+%
 %       number_partition - the number of times that the region was partitioned 
 %
 %Outputs:
@@ -25,7 +27,7 @@ function [Regions] = partition_rest_regions(Rest_regions, G, W, S, H, F, tol, Nu
 %Algoritm based on the paper "The explicit linear quadratic regulator for
 %constrained systems" by A. Bemporad, M. Morari, V. Dua, and E. Pistikopoulos. 
 
-    number_partition
+    number_partition;
     Regions = {};
     for i = 1:size(Rest_regions,1)
         A = Rest_regions{i,1};
@@ -41,7 +43,7 @@ function [Regions] = partition_rest_regions(Rest_regions, G, W, S, H, F, tol, Nu
             G_tio = [];
             %if isempty(z0) == 0
             if diagnostics.problem == 0
-                [G_tio W_tio S_tio] = verify_active_constraints(G, W, S, xc, z0, tol); %Find G_tio, W_tio e S_tio
+                [G_tio, W_tio, S_tio] = verify_active_constraints(G, W, S, xc, z0, tol); %Find G_tio, W_tio e S_tio
             end
             %Define U(x)
             if isempty(G_tio) == 1

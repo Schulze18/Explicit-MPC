@@ -11,6 +11,10 @@ function [xc , r, diagnostics] = chebychev_ball(A, b, G, W, S, H, F, Nu, Nstate)
 %                                 through z 
 %                                 subject to G*z <= W + S*x(t)
 %
+%       Nu - control horizon
+%
+%       Nstate - number of states 
+%
 %Outputs:
 %       xc - Chebyshev center
 %

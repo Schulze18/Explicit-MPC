@@ -83,7 +83,8 @@ N_zeros = 0;
 comb_ruim = {};
 
 while isempty(Lcand) == 0
-    fprintf('Exploradas: %d\nInexploradas: %d\nRegioes: %d\n\n',length(Lopt),length(Lcand),length(Regions));
+% fprintf('Exploradas: %d\nInexploradas: %d\nRegioes: %d\n\n',length(Lopt),length(Lcand),length(Regions));    
+    fprintf('Explored: %d\nUnexplored: %d\nRegions: %d\n\n',length(Lopt),length(Lcand),length(Regions));  
     %disp(['Exploradas: ', length(Lopt),' Inexploradas: ',length(Lcand),' Regioes: ', length(Regions)])
 %     disp('Exploradas ')
 %     length(Lopt)
@@ -98,7 +99,6 @@ while isempty(Lcand) == 0
         if rank(G_tio) < size(G_tio,1) && rank(G_tio) < size(G_tio,2)
             %[ G_tio, W_tio, S_tio, index, status_infesiable] = resolve_degenerancy(G, W, S, H, F, A, b, Nu, Nstate, Lcand{end,:}, tol);
             [ G_tio, W_tio, S_tio, index, status_infesiable] = resolve_degenerancy(G, W, S, H, F, Lcand{end,2}, Lcand{end,3}, Nu, Nstate, Lcand{end,1}, tol);
-            disp('UEHUEHEHUEHUEHEHUEHUE')
         end
         
         if status_infesiable == 0
@@ -207,7 +207,8 @@ while isempty(Lcand) == 0
     end
 %     Lcand{end,1}
 end
-    
+% fprintf('Exploradas: %d\nInexploradas: %d\nRegioes: %d\n\n',length(Lopt),length(Lcand),length(Regions));    
+fprintf('Explored: %d\nUnexplored: %d\nRegions: %d\n\n',length(Lopt),length(Lcand),length(Regions));  
 
 %%
 figure
@@ -216,11 +217,8 @@ for i=1:size(Regions,1)
    %plotregion(-[Regions{i,1}; 1 0; -1 0; 0 1; 0 -1],-[Regions{i,2}; 1.5 ;1.5 ;1.5 ; 1.5 ])
    %plotregion(-[Regions{i,1}; 1 0; -1 0; 0 1; 0 -1],-[Regions{i,2}; 15 ;15 ;15 ; 15 ])
    plotregion(-Regions{i,1},-Regions{i,2})
-   
-   
     xlim([-5 5])
     ylim([-5 5])
-    i
 end
 
 % 

@@ -7,6 +7,10 @@ function [CRest] = find_rest_regions(A, b, Nu, Nstate, out_region)
 %       out_region - describes the limits of the regions, i.e. it is the 
 %                    state constraints when creating the CR0
 %
+%       Nu - control horizon
+%
+%       Nstate - number of states 
+%
 %Outputs:
 %        CRest - a cell array with the N new rest regions, the first column
 %                of the ith row is the Ai and the second column is the bi

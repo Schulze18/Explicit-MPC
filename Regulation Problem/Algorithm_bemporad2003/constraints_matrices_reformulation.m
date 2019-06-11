@@ -1,14 +1,29 @@
 function [G, W, E, S] = constraints_matrices_reformulation(A, B, H, F, Sx, Su, Ny, Nu, Umax, Umin, Xmax, Xmin)
-%[G, W, E, S] = constraints_matrices_reformulation(A, B, H, F, Nu, Umax, Umin, Xmax, Xmin)
+%[G, W, E, S] = constraints_matrices_reformulation(B, H, F, Nu, Umax, Umin, Xmax, Xmin)
 %
 %Return the constraints matrices G, W and E from the reformulated cost function with U to
 %be opmitze.
 %Inputps:
+%        A, b - matrices from the state-space equation x[t+1] = A*x[t] + B*u[t]
+%
+%        H, F - from the cost function
+%
+%        Sx, Su - matrices from the state space over the prediction and control
+%        horizon: X = Sx*x[t] + Su*U       
+%
+%        Ny, Nu - prediction and control horizon
+%
+%        Umax, Umin - contraints on control action
+%
+%        Xmax, Xmin - constraints on state value
 %
 %Outpus:
-
+%        G, W, E and S - from the matrix inequalities G*z <= W + S*x(t) and GU <= W + Ex(t) 
+%
 %Algoritm based on the paper "The explicit linear quadratic regulator for
 %constrained systems" by A. Bemporad, M. Morari, V. Dua, and E. Pistikopoulos. 
+
+
 
     G_u = [];
     G_x = [];

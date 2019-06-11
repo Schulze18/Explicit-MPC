@@ -10,6 +10,10 @@ function [xc , r, diagnostics] = chebychev_ball(A, b, G, W, S, H, F, Nu, Nstate)
 %                          Vz(x) = 0.5*z'*H*z 
 %                                 through z 
 %                                 subject to G*z <= W + S*x(t)
+%       
+%       Nu - control horizon
+%
+%       Nstate - number of states 
 %
 %Outputs:
 %       xc - Chebyshev center
@@ -37,7 +41,7 @@ function [xc , r, diagnostics] = chebychev_ball(A, b, G, W, S, H, F, Nu, Nstate)
     options.verbose = 0;
     diagnostics = optimize(LMI,-r,options);
     
-    xc = double(xc)
+    xc = double(xc);
     r = double(r);
 
 end

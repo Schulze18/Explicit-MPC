@@ -5,6 +5,10 @@ function [A_new, b_new] = remove_redundant_constraints(A, b, Nu, Nstate)
 %Inputs:
 %       A, b - matrices that may contain redundant constraints
 %
+%       Nu - control horizon
+%
+%       Nstate - number of states 
+%
 %Outputs:
 %       A_new, b_new - matrices without redundant constraints
 %

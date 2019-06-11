@@ -4,7 +4,7 @@ function [H, F] = matrices_cost_function_reformulation(A, B, P, Q, R, Ny, Nu)
 %Return de matrices H and F from the reformulated cost function with U to
 %be opmitze.
 %Inputs:
-%       A,b - matrices from the state-space equation x[t+1] = A*x[t] + B*u[t]
+%       A, b - matrices from the state-space equation x[t+1] = A*x[t] + B*u[t]
 %
 %       P, Q, R - weighting matrices from the cost function:
 %                 J(U,x[t]) = xNy'*P*xNy + sum(k=0,...,Ny-1){xk'*Q*xk + uk'*R*uk}

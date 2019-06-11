@@ -19,10 +19,10 @@ x_inicial = [1 1]';
 %P dado pela solução de Lyapunov Eq 4
 P = dlyap(A,Q);
 
-[H, F] = matrices_cost_function_reformulation(A, B, P, Q, R, Ny, Nu)
+[H, F] = matrices_cost_function_reformulation(A, B, P, Q, R, Ny, Nu);
 Xmax = [1.5 1.5];
 Xmin = [-1.5 -1.5];
-[G, W, E, S] = constraints_matrices_reformulation(B, H, F, Nu, Umax, Umin, Xmax, Xmin)
+[G, W, E, S] = constraints_matrices_reformulation(B, H, F, Nu, Umax, Umin, Xmax, Xmin);
 %%
 
 % G = [ 1  0;
@@ -41,14 +41,14 @@ Xmin = [-1.5 -1.5];
 %%Criação de CR0 e primeira divisão das areas
 %% Calculo z0
 %S = E + G*inv(H)*F';
-z0 = optimal_z_mp_QP( G, W, S, H, F, x_inicial, Nu)
+z0 = optimal_z_mp_QP( G, W, S, H, F, x_inicial, Nu);
 %z0 = fcnKKT(H, F, G, E, W, x_inicial)
 %% Obtenção G_tio, W_tio e S_tio de CR0
 
 tol = 1e-8;
 [G_tio, W_tio, S_tio] = verify_active_constraints(G, W, S, x_inicial, z0, tol);
 
-[A_CR0 b_CR0] = define_region(G, W, S, G_tio, W_tio, S_tio, H, tol);
+[A_CR0, b_CR0] = define_region(G, W, S, G_tio, W_tio, S_tio, H, tol);
 [Kx, Kc] = define_control(G, W, S, G_tio, W_tio, S_tio, H, F);
 Regions{1,1} = A_CR0;
 Regions{1,2} = b_CR0;
@@ -73,6 +73,7 @@ for i = 1:3
 end
 xlim([-1.5 1.5])
 ylim([-1.5 1.5])
+title('CR_0 and CR^{rest}')
 
 %%
 new_Regions = partition_rest_regions(CR0_rest, G, W, S, H, F, tol, Nu, Nstate, 1);
@@ -88,3 +89,4 @@ end
 plotregion(-A_CR0,-b_CR0)
 xlim([-1.5 1.5])
 ylim([-1.5 1.5])
+title('Final Regions')
