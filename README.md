@@ -15,7 +15,7 @@ and to implement the BST. Copy or edit the files *binary_tree_generator_region.m
 
 A plugin with the BST implemented for the Quadrotor Iris 3DR on Gazebo is available [here](https://github.com/Schulze18/iris_plugin_explicit_mpc).
 
-I will post the abstract from my work and the version in portuguese in the near future.
+If you want to read the full-text from my thesis, check my Research Gate [here](https://www.researchgate.net/publication/343360836_Off-line_Model-Based_Predictive_Control_aplicado_a_Sistemas_Roboticos).
 
 If you have any doubts, feel free to ask me.
 
